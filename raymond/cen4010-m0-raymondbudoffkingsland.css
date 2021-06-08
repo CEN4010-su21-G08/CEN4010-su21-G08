@@ -1,0 +1,24 @@
+.centered {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 10%;
+  }
+
+  header {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-size: 40px;    
+    text-align: center;
+}
+
+h1 {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-size: 30px;    
+    text-align: center;
+}
+
+p {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-size: 15px;    
+    text-align: center;
+}
