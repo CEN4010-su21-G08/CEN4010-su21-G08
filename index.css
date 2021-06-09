@@ -48,12 +48,15 @@ header {
 
 .group_member:nth-child(2n) {
     flex-direction: row-reverse;
-    background-color: rgb(3, 179, 85);
     text-align: right;
 }
 
 .group_member:nth-child(3n) {
     background-color: rgb(255, 106, 7);
+}
+
+.group_member:nth-child(3n+2) {
+    background-color: rgb(3, 179, 85);
 }
 
 .group_member:nth-child(2n) .c1 {
