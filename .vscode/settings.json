@@ -1,4 +1,4 @@
 {
     "html.format.extraLiners": "",
-    "html.format.indentInnerHtml": false
+    "html.format.indentInnerHtml": true
 }
