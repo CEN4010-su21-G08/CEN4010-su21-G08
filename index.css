@@ -1,0 +1,75 @@
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+header {
+    text-align: center;
+}
+
+.group_member img {
+    border-radius: 100%;
+    display: inline;
+    vertical-align: middle;
+}
+
+.group_member h3 {
+    display: inline;
+    vertical-align: middle;
+    margin-top: auto;
+    margin-bottom: auto;
+    padding-left: 15px;
+}
+
+.group_member {
+    display: flex;
+}
+
+.group_member .c1 {
+    flex: 1;
+    vertical-align: middle;
+    margin-top: auto;
+    margin-bottom: auto;
+    display: flex;
+    padding: 10px;
+}
+
+.group_member .c2 {
+    flex: 1;
+    flex-grow: 3;
+    padding: 10px;
+}
+
+.group_member {
+    background-color: rgb(0, 119, 255);
+    color: white;
+    padding: 15px;
+    margin: 20px 50px;
+}
+
+.group_member:nth-child(2n) {
+    flex-direction: row-reverse;
+    background-color: rgb(3, 179, 85);
+    text-align: right;
+}
+
+.group_member:nth-child(3n) {
+    background-color: rgb(255, 106, 7);
+}
+
+.group_member:nth-child(2n) .c1 {
+    flex-direction: row-reverse;
+}
+
+.group_member:nth-child(2n) h3 {
+    padding-left: 0;
+    padding-right: 15px;
+}
+
+.group_member a {
+    color: white;
+    font-weight: bold;
+}
+
+.group_member a:active, .group_member a:hover {
+    color: #cccccc;
+}
