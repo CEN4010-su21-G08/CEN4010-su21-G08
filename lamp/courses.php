@@ -2,8 +2,12 @@
     $page_title = "Courses";
 ?>
 <?php include('common/header.php'); ?>
-<div class="container">
-<?php include('common/sidebar.php'); ?>
+<div>
+    <div class="row">
+        <?php include('common/sidebar.php'); ?>
+        <div class="col col-sm-9">
+            Courses
+        </div>
+    </div>
 </div>
-Courses
 <?php include('common/footer.php'); ?>
