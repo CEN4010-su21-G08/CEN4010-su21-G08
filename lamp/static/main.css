@@ -1,0 +1,8 @@
+.navbar.burrow-nav {
+    background-color: #003366 !important;
+    color: white;
+}
+
+.navbar.burrow-nav .dropdown-menu-dark {
+    background-color: #002160;
+}
