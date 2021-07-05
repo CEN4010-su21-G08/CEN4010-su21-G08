@@ -6,3 +6,10 @@
 .navbar.burrow-nav .dropdown-menu-dark {
     background-color: #002160;
 }
+
+aside.sidebar, aside.sidebar>div {
+    background-color: #cccccc;
+    width: 20%;
+    max-width: 400;
+    height: 100%;
+}
