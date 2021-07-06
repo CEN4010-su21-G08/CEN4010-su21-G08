@@ -13,3 +13,20 @@ aside.sidebar, aside.sidebar>div {
     align-content: center;
     display: flex;
 }
+
+div.container-fluid.main-content-div {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.messages .message {
+    margin: 15px;
+}
+
+.messages .message .message_author {
+    font-weight: bold;
+}
+
+.messages .message .message_content {
+    margin-left: 5px;
+}
