@@ -27,6 +27,21 @@ function get_channel_type($channel_id) {
     return $channel['type'];
 }
 
+function validate_input($arr, $field_name) {
+    if (!isset($arr[$field_name])) {
+        return false;
+    }
+    $data = $arr[$field_name];
+    if (empty($data)) {
+        return false;
+    }
+    $data = trim($data);
+    if ($data == "") {
+        return false;
+    }
+    return true;
+}
+
 function parse_input($field_name, $required=false) {
     if (!isset($_POST[$field_name])) {
         if ($required) throwError(400, "Invalid input. Missing field " . $field_name);
