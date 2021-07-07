@@ -30,3 +30,11 @@ div.container-fluid.main-content-div {
 .messages .message .message_content {
     margin-left: 5px;
 }
+
+body {
+    margin-left: 15px;
+}
+
+.navbar.burrow-nav {
+    margin-left: -15px;
+}
