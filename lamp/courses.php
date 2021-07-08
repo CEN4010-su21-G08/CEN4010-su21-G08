@@ -2,8 +2,19 @@
     $page_title = "Courses";
 ?>
 <?php require_once("lib/page-setup.php") ?>
+<?php require_once("lib/course-handler.php") ?>
 <?php include('common/header.php'); ?>
+<?php 
+function course_list_show_course($course) { ?>
+    <li><a href="channels.php?ch_id=<?php echo(urlencode(htmlspecialchars($course->course_id)));?>"><?php echo(htmlspecialchars($course->course_code)); ?>-<?php echo(htmlspecialchars($course->section_number)); ?></a></li>
+<?php } ?>
+<?php
+    $courses = CourseMembership::get_user_courses($_SESSION['uid']);
+    
+?>
 Courses<br />
-<a href="channels.php?ch_id=123">Test Channel</a><br />
-<a href="channels.php?ch_id=66a0c836-9f1c-44ed-85e6-b84d1c14f24f">Test Channel 2</a>
+<ul>
+    <?php foreach($courses as $course) {course_list_show_course($course);}?>
+</ul>
+<br />
 <?php include('common/footer.php'); ?>

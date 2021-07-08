@@ -56,8 +56,10 @@ Channels
         let data = $('#send_message_form').serialize();
         console.log(data);
         console.log(event.target);
+        $('#send_message_form').children("input[name=message]").addClass("disabled");
         $.post("messages.php?ch_id=" + encodeURIComponent("<?php echo(htmlspecialchars($_GET['ch_id'])); ?>"), data, () => {
-            // $('#send_message_form').children("input[name=message]").val("");
+            $('#send_message_form').children("input[name=message]").removeClass("disabled");
+            $('#send_message_form').children("input[name=message]").val("");
             console.log('sent');
             getNewMessages();
             
