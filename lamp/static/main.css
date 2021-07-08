@@ -1,0 +1,40 @@
+.navbar.burrow-nav {
+    background-color: #003366 !important;
+    color: white;
+}
+
+.navbar.burrow-nav .dropdown-menu-dark {
+    background-color: #002160;
+}
+
+aside.sidebar, aside.sidebar>div {
+    background-color: #cccccc;
+    justify-content: center;
+    align-content: center;
+    display: flex;
+}
+
+div.container-fluid.main-content-div {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.messages .message {
+    margin: 15px;
+}
+
+.messages .message .message_author {
+    font-weight: bold;
+}
+
+.messages .message .message_content {
+    margin-left: 5px;
+}
+
+body {
+    margin-left: 15px;
+}
+
+.navbar.burrow-nav {
+    margin-left: -15px;
+}
