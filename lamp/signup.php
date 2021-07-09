@@ -20,7 +20,7 @@
         <input name="first_name" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['first_name'])); ?>" <?php } ?>placeholder="first name" /><br />
         <input name="last_name" placeholder="last_name" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['last_name'])); ?>" <?php } ?> /><br />
         <input name="email" placeholder="email" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['email'])); ?>" <?php } ?> /><br />
-        <input name="password" placeholder="password" /><br />
+        <input name="password" type="password" placeholder="password" /><br />
         <select name="display_name" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['display_name'])); ?>" <?php } ?>>
         <option value="1">First Last</option>
         <option value="2">Last First</option>
