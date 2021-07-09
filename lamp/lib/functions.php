@@ -1,5 +1,18 @@
 <?php
 
+/* Temporary fix because composer does not work on older versions of PHP
+    (the previously-used UUID package used Composer) */
+/* Code Snippet taken from SO answer: https://stackoverflow.com/a/4356295 */
+function generateRandomString($length = 36) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
 function get_display_name($first_name, $last_name, $display_option) {
     switch($display_option) {
         case 1:

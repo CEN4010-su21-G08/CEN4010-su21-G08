@@ -1,9 +1,9 @@
 <?php
-    foreach (glob("vendor/*.php") as $filename) {
-        require_once $filename;
-    }
-    use Ramsey\Uuid\UuidInterface;
-    use Ramsey\Uuid\Uuid;
+    // foreach (glob("vendor/*.php") as $filename) {
+    //     require_once $filename;
+    // }
+    // use Ramsey\Uuid\UuidInterface;
+    // use Ramsey\Uuid\Uuid;
     error_reporting(-1);
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     function sign_in_user($email_address, $password) {
@@ -102,8 +102,9 @@
         $password = parse_input('password', true);
         $display_name = intval(parse_input('display_name', true));
         
-        $_uuid = Uuid::uuid4();
-        $uuid = $_uuid->toString();
+        //$_uuid = Uuid::uuid4();
+        //$uuid = $_uuid->toString();
+        $uuid = generateRandomString();
         
         $h_s_pass = password_hash($password, PASSWORD_DEFAULT);
         
