@@ -54,12 +54,15 @@
                 return array();
             }
 
-            $rows = $result->fetch_all(MYSQLI_ASSOC);
-
+            // $rows = $result->fetch_all(MYSQLI_ASSOC);
             $out = array();
-            foreach($rows as $row) {
+            while ($row = $result->fetch_assoc()) {
                 $out[] = $row['ch_id'];
             }
+
+            // foreach($rows as $row) {
+            //     $out[] = $row['ch_id'];
+            // }
 
             return $out;
 
@@ -82,11 +85,9 @@
                 return array();
             }
 
-            $rows = $result->fetch_all(MYSQLI_ASSOC);
-
+            // $rows = $result->fetch_all(MYSQLI_ASSOC);
             $out = array();
-            foreach($rows as $row) {
-                // var_dump($row);
+            while ($row = $result->fetch_assoc()) {
                 $c = new Course();
                 $c->course_code = $row['course_code'];
                 $c->section_number = $row['section_number'];

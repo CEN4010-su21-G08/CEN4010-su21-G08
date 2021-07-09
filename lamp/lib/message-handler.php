@@ -59,10 +59,11 @@
 
         // $statement->execute();
         // $result = $statement->get_result();
-        $rows = $result->fetch_all(MYSQLI_ASSOC);
+        // $rows = $result->fetch_all(MYSQLI_ASSOC);
         
         $new_rows = [];
-        foreach($rows as $row) {
+        // foreach($rows as $row) {
+        while ($row = $result->fetch_assoc()) {
             if ($row['display_name'] == NULL || $row['display_name'] == NULL || $row['display_name'] == NULL) {
                 $row['display_name'] = "Deleted User";
                 $row["initials"] = "NA";

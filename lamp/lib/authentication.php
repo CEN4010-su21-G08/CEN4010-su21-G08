@@ -9,7 +9,7 @@
     function sign_in_user($email_address, $password) {
         global $conn;
         $sql = "SELECT `email`, `password`, `uid` FROM `users` WHERE `email` = '" . $conn->real_escape_string($email_address) . "'";
-        var_dump($sql);
+        //var_dump($sql);
         $result = $conn->query($sql);
         
         // $statement = $conn->prepare($sql);
