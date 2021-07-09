@@ -37,22 +37,28 @@
     function get_messages($start_after = NULL, $json = false) {
         global $channel_id;
         global $conn;
+        
         // $sql = "SELECT * FROM `messages` WHERE `ch_id` = ?";
-        $sql = "SELECT `messages`.*, `users`.`first_name`, `users`.`last_name`, `users`.`display_name` FROM `messages` LEFT JOIN `users` ON `messages`.`uid` = `users`.`uid` WHERE `messages`.`ch_id` = ?";
+        $sql = "SELECT `messages`.*, `users`.`first_name`, `users`.`last_name`, `users`.`display_name` FROM `messages` LEFT JOIN `users` ON `messages`.`uid` = `users`.`uid` WHERE `messages`.`ch_id` = '" . $conn->real_escape_string($channel_id) . "'";
         if (isset($start_after) && $start_after != NULL) {
-            $sql .= " AND `messages`.`send_date` >= ?";
+            $sql .= " AND `messages`.`send_date` >= '" . $conn->real_escape_string($start_after) . "'";
         }
         $sql .= " ORDER BY `messages`.`send_date` DESC LIMIT 5;";
-        error_log($sql);
-        error_log($start_after);
-        $statement = $conn->prepare($sql);
-        if (isset($start_after) && $start_after != NULL) {
-            $statement->bind_param("ss", $channel_id, $start_after);
-        } else {
-            $statement->bind_param("s", $channel_id);
-        }
-        $statement->execute();
-        $result = $statement->get_result();
+        // error_log($sql);
+        // error_log($start_after);
+        // $statement = $conn->prepare($sql);
+        // if (isset($start_after) && $start_after != NULL) {
+        //     $statement->bind_param("ss", $channel_id, $start_after);
+        // } else {
+        //     $statement->bind_param("s", $channel_id);
+        // }
+
+        
+        $result = $conn->query($sql);
+
+
+        // $statement->execute();
+        // $result = $statement->get_result();
         $rows = $result->fetch_all(MYSQLI_ASSOC);
         
         $new_rows = [];

@@ -9,13 +9,14 @@
         {
             global $conn;
 
-            $sql = "SELECT * FROM `courseMembership` WHERE `uid` = ? AND `ch_id` = ?";
-            $statement = $conn->prepare($sql);
+            $sql = "SELECT * FROM `courseMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($course_id) . "'";
+            $result = $conn->query($sql);
+            // $statement = $conn->prepare($sql);
 
-            $statement->bind_param("ss", $uid, $course_id);
-            $statement->execute();
+            // $statement->bind_param("ss", $uid, $course_id);
+            // $statement->execute();
             
-            $result = $statement->get_result();
+            // $result = $statement->get_result();
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
                 return null;
@@ -40,13 +41,14 @@
         {
             global $conn;
 
-            $sql = "SELECT * FROM `courseMembership` WHERE `uid` = ?";
-            $statement = $conn->prepare($sql);
+            $sql = "SELECT * FROM `courseMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+            $result = $conn->query($sql);
+            // $statement = $conn->prepare($sql);
 
-            $statement->bind_param("s", $uid);
-            $statement->execute();
+            // $statement->bind_param("s", $uid);
+            // $statement->execute();
             
-            $result = $statement->get_result();
+            // $result = $statement->get_result();
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
                 return array();
@@ -67,13 +69,14 @@
         {
             global $conn;
 
-            $sql = "SELECT * FROM `courseMembership` LEFT JOIN `courses` ON `courses`.`course_id` = `courseMembership`.`ch_id` WHERE `uid` = ?";
-            $statement = $conn->prepare($sql);
+            $sql = "SELECT * FROM `courseMembership` LEFT JOIN `courses` ON `courses`.`course_id` = `courseMembership`.`ch_id` WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+            $result = $conn->query($sql);
+            // $statement = $conn->prepare($sql);
 
-            $statement->bind_param("s", $uid);
-            $statement->execute();
+            // $statement->bind_param("s", $uid);
+            // $statement->execute();
             
-            $result = $statement->get_result();
+            // $result = $statement->get_result();
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
                 return array();
@@ -126,13 +129,14 @@
             if ($course_id != null) {
                 global $conn;
 
-                $sql = "SELECT * FROM `courses` WHERE `course_id` = ?";
-                $statement = $conn->prepare($sql);
+                $sql = "SELECT * FROM `courses` WHERE `course_id` = '" . $conn->real_escape_string($course_id) . "'";
+                $result = $conn->query($sql);
+                // $statement = $conn->prepare($sql);
 
-                $statement->bind_param("s", $course_id);
-                $statement->execute();
+                // $statement->bind_param("s", $course_id);
+                // $statement->execute();
                 
-                $result = $statement->get_result();
+                // $result = $statement->get_result();
                 $numRows = mysqli_num_rows($result);
                 if ($numRows <= 0) {
                     return new Course();

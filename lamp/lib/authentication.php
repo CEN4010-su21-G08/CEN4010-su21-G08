@@ -8,11 +8,15 @@
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     function sign_in_user($email_address, $password) {
         global $conn;
-        $sql = "SELECT `email`, `password`, `uid` FROM `users` WHERE `email` = ?";
-        $statement = $conn->prepare($sql);
-        $statement->bind_param("s", $email_address);
-        $statement->execute();
-        $result = $statement->get_result();
+        $sql = "SELECT `email`, `password`, `uid` FROM `users` WHERE `email` = '" . $conn->real_escape_string($email_address) . "'";
+        var_dump($sql);
+        $result = $conn->query($sql);
+        
+        // $statement = $conn->prepare($sql);
+        // $statement->bind_param("s", $email_address);
+        // $statement->execute();
+        // $result = $statement->get_result();
+        
         $numRows = mysqli_num_rows($result);
         if ($numRows <= 0) {
             return 0;
@@ -44,12 +48,14 @@
             } else {
                 return false;
             }
-            $sql = "SELECT * FROM `". $table . "` WHERE `ch_id` = ? AND `uid` = ?";
-            $statement = $conn->prepare($sql);
+            $sql = "SELECT * FROM `". $table . "` WHERE `ch_id` = '". $conn->real_escape_string($channel_id). "' AND `uid` = '". $conn->real_escape_string($uid) . "'";
+            $result = $conn->query($sql);
 
-            $statement->bind_param("ss", $channel_id, $uid);
-            $statement->execute();
-            $result = $statement->get_result();
+            // $statement = $conn->prepare($sql);
+
+            // $statement->bind_param("ss", $channel_id, $uid);
+            // $statement->execute();
+            // $result = $statement->get_result();
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
                 return false; // no membership entry
@@ -73,11 +79,13 @@
 
     function set_up_user_session($user_uid) {
         global $conn;
-        $sql = "SELECT `email`, `uid`, `first_name`, `last_name`, `display_name` FROM `users` WHERE `uid` = ?";
-        $statement = $conn->prepare($sql);
-        $statement->bind_param("s", $user_uid);
-        $statement->execute();
-        $result = $statement->get_result();
+        $sql = "SELECT `email`, `uid`, `first_name`, `last_name`, `display_name` FROM `users` WHERE `uid` = '" . $conn->real_escape_string($user_uid) . "'";
+        // $statement = $conn->prepare($sql);
+        // $statement->bind_param("s", $user_uid)
+        $result = $conn->query($sql);
+
+        // $statement->execute();
+        // $result = $statement->get_result();
         $user = $result->fetch_assoc();
         echo $user['uid'];
         $_SESSION['uid'] = $user['uid'];

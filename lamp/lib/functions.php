@@ -25,13 +25,14 @@ function get_display_name($first_name, $last_name, $display_option) {
 
 function get_channel_type($channel_id) {
     global $conn;
-    $sql = "SELECT `type` FROM `channels` WHERE `ch_id` = ?";
-    $statement = $conn->prepare($sql);
+    $sql = "SELECT `type` FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($channel_id) . "'";
+    $result = $conn->query($sql);
+    // $statement = $conn->prepare($sql);
     
-    $statement->bind_param("s", $channel_id);
-    $statement->execute();
+    // $statement->bind_param("s", $channel_id);
+    // $statement->execute();
     
-    $result = $statement->get_result();
+    // $result = $statement->get_result();
     $numRows = mysqli_num_rows($result);
     if ($numRows <= 0) {
         return 0;
