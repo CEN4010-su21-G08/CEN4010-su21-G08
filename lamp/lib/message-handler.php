@@ -1,9 +1,9 @@
 <?php
-    foreach (glob("vendor/*.php") as $filename) {
-        require_once $filename;}
+    // foreach (glob("vendor/*.php") as $filename) {
+    //     require_once $filename;}
 
-    use Ramsey\Uuid\UuidInterface;
-    use Ramsey\Uuid\Uuid;
+    // use Ramsey\Uuid\UuidInterface;
+    // use Ramsey\Uuid\Uuid;
     error_reporting(-1);
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
@@ -23,8 +23,9 @@
         // echo '<br />';
         // echo $message;
 
-        $_mid = Uuid::uuid4();
-        $mid = $_mid->toString();
+        // $_mid = Uuid::uuid4();
+        // $mid = $_mid->toString();
+        $mid = generateRandomString();
 
         $uid = $_SESSION['uid'];
         
