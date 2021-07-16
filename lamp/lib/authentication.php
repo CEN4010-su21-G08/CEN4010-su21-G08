@@ -87,7 +87,7 @@
         // $statement->execute();
         // $result = $statement->get_result();
         $user = $result->fetch_assoc();
-        echo $user['uid'];
+        //echo $user['uid'];
         $_SESSION['uid'] = $user['uid'];
         $_SESSION['user_id'] = $user['uid'];
         $_SESSION['email'] = $user['email'];
