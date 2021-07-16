@@ -15,7 +15,7 @@ function renderSignInPage($error = "") {
          </div>
     <?php } ?>
     <form method="post" action="<?php echo(htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
-        <span style="color: #cc0000;"><?php echo $error; ?>
+        <span style="color: #cc0000;"><?php echo $error; ?></span>
         <br />
         <input name="email" placeholder="email" <?php if ($error != '') {?>value="<?php echo htmlspecialchars($_POST['email']); ?>"<?php } ?> /><br />
         <input name="password" type="password" placeholder="password" /><br />
