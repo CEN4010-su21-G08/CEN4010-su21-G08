@@ -54,7 +54,7 @@
                 if ($numRows > 0) {
                     $user = $result->fetch_assoc();
                     //var_dump($user);
-                    echo "<br />";
+                    // echo "<br />";
                     //var_dump($this);
                     if (in_array('uid', $cols)) { $this->uid = $user['uid']; }
                     if (in_array('first_name', $cols)) { $this->first_name = $user['first_name']; }
