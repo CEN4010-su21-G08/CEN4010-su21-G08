@@ -102,7 +102,7 @@
             return $out;
         } // includes instance of Course
         
-        public static function create_membership($uid, $course_id, $role = 1)
+        public static function create_membership($uid, $ch_id, $role = 1)
         {
             // $uid = $_SESSION['uid'];
     
