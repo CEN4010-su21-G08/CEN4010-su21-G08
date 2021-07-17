@@ -7,6 +7,30 @@
     error_reporting(-1);
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
+    // Not going to include Google APIs into the git repo, so:
+    /*
+        Download/Install
+        1. Go to https://github.com/googleapis/google-api-php-client/releases
+        2. Download the zip file for the PHP version being used
+        3. Create the folder lamp/lib/googleapis
+        4. Copy the contents of the ZIP file from #2 into the lamp/lib/googleapis folder
+        5. Ensure the vendor folder is accessible at lamp/lib/googleapis/vendor. 
+           If it isn't, you copied the files incorrectly
+        6. Copy googleapis-config-sample.php as googleapis-config.php
+        7. Fill in the appropriate values for the client id, secret, and redirect URI
+    */
+    require_once("lib/googleapis/vendor/autoload.php");
+    require_once("lib/googleapis-config.php");
+
+    $client = new Google\Client();
+    $client->setClientId($google_client_id);
+    $client->setClientSecret($google_client_secret);
+    $client->setRedirectUri($google_redirect_uri);
+    $client->addScope("email");
+    $client->addScope("profile");
+    $client->setAccessType("offline");
+    
+
     class User {
         public $uid = null;
         public $first_name = null;
@@ -19,7 +43,7 @@
         private $password = null;
 
         /* $cols should not be user-provided input */
-        function __construct($uid=null, $email=null, $cols=["uid", "email", "first_name", "last_name", "display_name"]) {
+        function __construct($uid=null, $email=null, $cols=["uid", "email", "first_name", "last_name", "display_name", "google_user_id"]) {
             global $conn;
             if ($uid == null && $email == null) {
                 // do nothing
@@ -214,6 +238,74 @@
             return null;
         }
 
+        public function has_verified() {
+            return $this->google_user_id != null;
+        }
+
+        public function create_google_sign_in_button() {
+            global $client;
+            $client->setLoginHint($this->email);
+            ?>
+                <a href="<?php echo (filter_var($client->createAuthUrl(), FILTER_SANITIZE_URL));?>" class="google-signin-button">
+                    <div class="g-content-wrapper">
+                        <div class="g-icon">
+                            <div class="g-icon-2">
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48" class="abcRioButtonSvg"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg>
+                            </div>
+                        </div>
+                        <span class="g-text">Sign in with Google</span>
+                    </div>
+                </a>
+                <br /><br />
+            <?php
+            }
+
+        public function handle_google_callback($code) {
+            global $client;
+            if ($this->has_verified()) {
+                return true;
+            }
+            $access_token = $client->fetchAccessTokenWithAuthCode($code);
+            $client->setAccessToken($access_token);
+
+            $profile_api = new Google_Service_PeopleService($client);
+            $p = $profile_api->people->get("people/me", array('personFields' => "emailAddresses"));
+            
+            $emails = $p->emailAddresses;
+
+            $hasEmail = false;
+            $emailVerifiedG = false;
+            $g_uid = null;
+
+            // iterate through all emails, make sure at least one email is the user's email
+            foreach ($emails as $email) {
+                if ($email->value == $this->email) {
+                    $hasEmail = true;
+                    if ($email->metadata->verified) {
+                        $emailVerifiedG = true;
+                        $g_uid = $email->metadata->source->id;
+                    }
+                    break;
+                }
+            }
+
+            if (!$hasEmail) {
+                echo "Error: Your account's email is not one of the email addresses on your google account.";
+            } else if (!$emailVerifiedG) {
+                echo "Error: Your account's email is not a verified email address on your Google account.";
+            } else if ($g_uid == null) {
+                echo "Error: Something went wrong";
+            } else {
+                // verify email
+                // by setting google_user_id to $g_uid
+                global $conn;
+                $sql = "UPDATE `users` SET `google_user_id`='" . $conn->real_escape_string($g_uid) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+
+                $conn->query($sql);
+
+                header("Location: verify.php?success");
+            }
+        }
     }
 
     /* function sign_in_user($email_address, $password) {

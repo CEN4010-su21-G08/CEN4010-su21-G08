@@ -38,3 +38,54 @@ body {
 .navbar.burrow-nav {
     margin-left: -15px;
 }
+
+.google-signin-button {
+    display: block;
+    background-color: #4285f4;
+    color: white;
+    height: 50px;
+    width: 240px;
+    border-radius: 1px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 25%);
+    text-decoration: none;
+}
+
+.google-signin-button:hover {
+    color: white;
+    box-shadow: 0 0 3px 3px rgb(66 133 244 / 30%);
+}
+
+.google-signin-button:active {
+    background-color: #3367d6;
+}
+
+.google-signin-button .g-content-wrapper {
+    border: 1px solid transparent;
+}
+
+.google-signin-button .g-icon {
+    padding: 15px;
+    background-color: #ffffff;
+    float: left;
+    border-radius: 1px;
+}
+
+.google-signin-button .g-icon-2 {
+    height: 18px;
+    width: 18px;
+}
+
+.google-signin-button .g-text {
+    font-family: Roboto, arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .21px;
+    margin-left: 6px;
+    margin-right: 6px;
+    vertical-align: top;
+    font-size: 16px;
+    line-height: 48px;
+}
