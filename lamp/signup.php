@@ -17,10 +17,15 @@
         <br />
         <form method="post" action="<?php echo(htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
 
+        <input required name="first_name" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['first_name'])); ?>" <?php } ?>placeholder="first name" /><br />
+        <input required name="last_name" placeholder="last_name" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['last_name'])); ?>" <?php } ?> /><br />
+        <input required type="email" name="email" placeholder="email" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['email'])); ?>" <?php } ?> /><br />
+        <input required name="password" minlength="8" type="password" placeholder="password" /><br />
         <input required name="verify_password" minlength="8" type="password" placeholder="Confirm Password" /><br />
+        <select required name="display_name" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['display_name'])); ?>" <?php } ?>>
         <option value="1">First Last</option>
         <option value="2">Last First</option>
-        </select><br />
+        </select><br /><br />
         <button type="submit">Submit</button>
         </form>
 <?php } ?>
