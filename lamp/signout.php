@@ -4,7 +4,7 @@
 ?>
 <?php require_once("lib/page-setup.php"); ?>
 <?php
-        sign_out_user();
+    User::sign_out();
 ?>
     <?php include('common/header.php'); ?>
     <h2>You have been signed out</h2>

@@ -2,6 +2,7 @@
     define("app_page", true);
 
     $is_logged_in = false;
+    $user = null;
 
     require_once('lib/database.php');
     require_once('lib/functions.php');
@@ -10,6 +11,7 @@
     session_start();
     if (isset($_SESSION['user_id'])) {
         $is_logged_in = true;
+        $user = new User($_SESSION['user_id']);
     }
 
     if (isset($auth_needed) && ($auth_needed == false)) {

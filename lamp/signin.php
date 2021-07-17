@@ -30,8 +30,8 @@ function renderSignInPage($error = "") {
         if ($em == NULL || $p == NULL) {
             renderSignInPage('Invalid email address or password');
         } else {
-            $s = sign_in_user($em, $p);
-            if ($s == 0) {
+            $s = User::sign_in($em, $p);
+            if ($s->uid == null) {
                 renderSignInPage('Invalid email address or password');
             } else {
                 header("Location: courses.php");
