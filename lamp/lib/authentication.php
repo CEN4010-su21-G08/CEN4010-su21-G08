@@ -368,3 +368,16 @@
         }
 
     }
+
+    function is_user_instructor($course_id)
+    {
+        global $conn;
+        $uid = $_SESSION['uid'];
+
+        $Membership = new CourseMembership($uid, $course_id);
+        
+        if ($Membership->role == 2)
+            return true;
+        else
+            return false;
+    }

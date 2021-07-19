@@ -16,6 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     $channel_id = $_GET["ch_id"];
     $channel = new Channel($channel_id);
     $course = new Course($channel->course_id);
+    $is_instructor = is_user_instructor($course->course_id);
 
 
     $has_access = does_user_have_access($_SESSION['uid'], $channel_id);
@@ -38,6 +39,10 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     }
                     ?>
                 </h2>
+                <?php
+                    if ($is_instructor)
+                        ?><h2>INSTRUCTOR VIEW</h2><?php;
+                ?>
                 <div class="older">
                     <button id="older-btn" class="btn btn-outline-secondary" onclick="getOlderMessages();">Load earlier messages</button>
                 </div>
