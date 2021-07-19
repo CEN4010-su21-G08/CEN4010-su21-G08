@@ -1,9 +1,8 @@
 <?php
-
     class CourseMembership {
         public $uid = null;
         public $ch_id = null;
-        public $type = null;
+        public $role = null;
 
         function __construct($uid, $ch_id) 
         {
@@ -24,9 +23,9 @@
 
             $courseMembership = $result->fetch_assoc();
 
-            $this->$uid = $courseMembership['uid'];
+            $this->uid = $courseMembership['uid'];
             $this->ch_id = $courseMembership['ch_id'];
-            $this->type = $courseMembership['type'];
+            $this->role = $courseMembership['role'];
         }
 
         public static function is_user_member($uid, $ch_id) {
