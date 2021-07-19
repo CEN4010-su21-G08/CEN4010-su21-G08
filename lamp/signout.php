@@ -7,5 +7,12 @@
     User::sign_out();
 ?>
     <?php include('common/header.php'); ?>
-    <h2>You have been signed out</h2>
+    <div class="signoutdiv">
+        <h2 class="maintitleheader">Sign out<h2>
+        <hr/>
+        <h1>You have been signed out</h2>
+        <br>
+        <br>
+        <a href="index.php">Click here to return to home page</a> 
+    </div>
 <?php include('common/footer.php'); ?>
