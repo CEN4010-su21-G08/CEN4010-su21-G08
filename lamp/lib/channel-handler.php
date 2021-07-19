@@ -45,6 +45,23 @@
             return $out;
         }
 
+        public static function get_users_channels_in_course($uid, $course_id)
+        {
+            $course_channels = Channel::get_course_channels($course_id);
+
+            $userchannels = array();
+
+            foreach ($course_channels as $course_channel_id)
+            {
+                if (does_user_have_access($_SESSION['uid'], $course_channel_id))
+                {
+                    $userchannels[] = new Channel($course_channel_id);
+                }
+            }
+
+            return $userchannels;
+        }
+
         public static function create_channel($course_id, $name=null, $type=1)
         {
             global $conn;

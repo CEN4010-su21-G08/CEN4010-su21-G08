@@ -18,15 +18,7 @@
         header("Location: courses.php");
     }
 
-    $course_channels = Channel::get_course_channels($channel->course_id);
-    $mychannels = array();
-    foreach ($course_channels as $course_channel_id)
-    {
-        if (does_user_have_access($_SESSION['uid'], $course_channel_id))
-        {
-            $mychannels[] = new Channel($course_channel_id);
-        }
-    }
+    $mychannels = Channel::get_users_channels_in_course($_SESSION['uid'], $channel->course_id);
 
     $has_access = does_user_have_access($_SESSION['uid'], $channel_id);
     
@@ -62,7 +54,7 @@ if (!$has_access) {?>
             echo("Chat");
         }
         else {
-            echo(htmlspecialchars($mychannel->name));
+            echo(htmlspecialchars($channel->name));
         }
     ?>
  </h2>
