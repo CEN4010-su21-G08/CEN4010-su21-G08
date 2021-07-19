@@ -39,6 +39,7 @@ if (!$has_access) {?>
     <?php } else {?>
 <!-- Side navigation -->
 <div class="sidenav">
+    <h3>Channels</h3>
     <?php
     foreach ($mychannels as $mychannel)
     {
@@ -53,7 +54,7 @@ if (!$has_access) {?>
     }
     ?>
 </div>
-Channels
+<div class="channels_main">
 <div>
 <h2>
     <?php
@@ -158,5 +159,6 @@ Channels
     }
 </script>
 <?php } ?>
+</div>
 <?php include('common/footer.php'); ?>
 <?php } ?>
