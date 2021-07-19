@@ -33,8 +33,9 @@ if (!$has_access) {?>
 <div class="sidenav">
     <h3>Channels</h3>
     <?php
-    foreach ($mychannels as $mychannel)
+    foreach ($mychannels as $mychannelid)
     {
+        $mychannel = new Channel($mychannelid);
         if (!isset($mychannel->name))
         {
             ?> <a href="channels.php?ch_id=<?php echo(urlencode(htmlspecialchars($mychannel->ch_id)));?>">Chat</a><?php

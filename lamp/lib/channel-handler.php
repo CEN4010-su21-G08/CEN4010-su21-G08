@@ -47,19 +47,26 @@
 
         public static function get_users_channels_in_course($uid, $course_id)
         {
-            $course_channels = Channel::get_course_channels($course_id);
+            global $conn;
 
-            $userchannels = array();
+            $sql = "SELECT * FROM `groupMembership` LEFT JOIN `channels` ON `channels`.`ch_id` = `groupMembership`.`ch_id` WHERE `channels`.`course_id` = '" . $conn->real_escape_string($course_id) . "'";
+            $result = $conn->query($sql);
 
-            foreach ($course_channels as $course_channel_id)
+            $numRows = mysqli_num_rows($result);
+            if ($numRows <= 0) {
+                $out = array();
+            }
+            else
             {
-                if (does_user_have_access($_SESSION['uid'], $course_channel_id))
-                {
-                    $userchannels[] = new Channel($course_channel_id);
-                }
+            $out = array();
+            while ($row = $result->fetch_assoc()) {
+                $out[] = $row['ch_id'];
+            }
             }
 
-            return $userchannels;
+            $out[] = $course_id;
+
+            return $out;
         }
 
         public static function create_channel($course_id, $name=null, $type=1)
