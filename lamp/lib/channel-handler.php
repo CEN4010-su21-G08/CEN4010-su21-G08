@@ -49,7 +49,7 @@
         {
             global $conn;
 
-            $sql = "SELECT * FROM `groupMembership` LEFT JOIN `channels` ON `channels`.`ch_id` = `groupMembership`.`ch_id` WHERE `channels`.`course_id` = '" . $conn->real_escape_string($course_id) . "'";
+            $sql = "SELECT * FROM `groupMembership` LEFT JOIN `channels` ON `channels`.`ch_id` = `groupMembership`.`ch_id` WHERE `channels`.`course_id` = '" . $conn->real_escape_string($course_id) . "' AND `groupMembership`.`uid` = '" . $conn->real_escape_string($uid) . "'";
             $result = $conn->query($sql);
 
             $numRows = mysqli_num_rows($result);
