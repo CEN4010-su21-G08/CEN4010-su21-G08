@@ -19,6 +19,7 @@
     } else {
         if (!$is_logged_in) {
             header("Location: signin.php?r");
+            die();
         } else {
             if (isset($verify_page) && $verify_page == true) {
 
