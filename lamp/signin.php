@@ -1,6 +1,7 @@
 <?php
     $page_title = "Sign in";
     $auth_needed = false;
+    $center_page = true;
 ?>
 <?php require_once("lib/page-setup.php") ?>
 <?php 
@@ -10,25 +11,29 @@ function renderSignInPage($error = "") {
     <div class="signinupdiv">
         <h2 class="maintitleheader">Sign In</h2>
         <hr/>
-        <h1>Please sign in below</h1>
-    <a class="btn btn-outline-primary" href="signup.php">Sign up</a>
+        <p>Please sign in below</p>
+    <p>
+        Don't have an account? <a class="link-no-history link-no-underline" href="signup.php">Sign up here</a>
+    </p>
     <?php if (isset($_GET['r'])) { ?>
         <div class="alert alert-warning" style="margin: 5px 15px;">
             You need to be signed in to access that page.
          </div>
     <?php } ?>
-    <form method="post" action="<?php echo(htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
+    <form class="burrow-form sign-in-form" method="post" action="<?php echo(htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
         <span style="color: #cc0000;"><?php echo $error; ?></span>
         <br />
         <div class="form-group">
             <label for="email">Email</label>
-            <input name="email" placeholder="Enter Your Email Here" id="email" <?php if ($error != '') {?>value="<?php echo htmlspecialchars($_POST['email']); ?>"<?php } ?> />
+            <input class="form-control" name="email" placeholder="example@fau.edu" id="email" <?php if ($error != '') {?>value="<?php echo htmlspecialchars($_POST['email']); ?>"<?php } ?> />
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input name="password" type="password" placeholder="Enter Your Password Here" id="password"/>
+            <input class="form-control" name="password" type="password" placeholder="Password" id="password"/>
         </div>
-        <button type="submit" class="btn btn-secondary">Sign In</button>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </div>
     </form>
     </div>
 <?php }
