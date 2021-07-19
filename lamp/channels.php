@@ -1,8 +1,9 @@
 <?php
     $page_title = "Channels";
 ?>
-<?php require_once("lib/page-setup.php") ?>
+<?php require_once("lib/page-setup.php"); ?>
 <?php include('lib/message-handler.php'); ?>
+<?php include('lib/channel-handler.php'); ?>
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         //send_message();
@@ -11,6 +12,7 @@
 <?php 
     if (isset($_GET['ch_id'])) {
         $channel_id = $_GET["ch_id"];
+        $channel = new Channel($channel_id);
     } else {
         header("Location: courses.php");
     }
