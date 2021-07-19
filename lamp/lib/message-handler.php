@@ -30,7 +30,7 @@ class Message
         $this->initials = $initials;
     }
 
-    public static function send($channel_id, $uid, $message)
+    public static function send($channel_id, $uid, $message, $announcement = false)
     {
         if (!isset($channel_id)) {
             return ['error' => "Invalid channel ID provided."];
@@ -39,9 +39,22 @@ class Message
         if (!does_user_have_access($uid, $channel_id)) {
             return ['error' => "Forbidden"];
         }
+
+        if ($announcement && !is_user_instructor($channel_id)) {
+            return ['error' => "Forbidden"];
+        }
+
         global $conn;
 
-        $sql = "INSERT INTO `messages` (`m_id`, `uid`, `message`, `ch_id`) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO `messages` (`m_id`, `uid`, `message`, `ch_id`";
+        if ($announcement) {
+            $sql .= ", `flags`";
+        }
+        $sql .= ") VALUES (?, ?, ?, ?";
+        if ($announcement) {
+            $sql .= ", ?";
+        }
+        $sql .= ")";
         $statement = $conn->prepare($sql);
 
         $message = parse_input('message', true);
@@ -49,8 +62,13 @@ class Message
 
         $uid = $_SESSION['uid'];
 
-
-        $statement->bind_param("ssss", $mid, $uid, $message, $channel_id);
+        $flags = intval(1);
+        if ($announcement) {
+            $statement->bind_param("ssssi", $mid, $uid, $message, $channel_id, $flags);
+        } else {
+            $statement->bind_param("ssss", $mid, $uid, $message, $channel_id);
+        }
+        
         $statement->execute();
 
         return ['success' => 'true'];
@@ -85,7 +103,7 @@ class Message
         return $messages;
     }
 
-    public static function get_after($channel_id, $after_m_id = null)
+    public static function get_after($channel_id, $after_m_id = null, $announcement = false)
     {
         global $user;
         if (!does_user_have_access($user->uid, $channel_id)) {
@@ -93,6 +111,9 @@ class Message
         }
         global $conn;
         $sql = "SELECT `messages`.*, `users`.`first_name`, `users`.`last_name`, `users`.`display_name` FROM `messages` LEFT JOIN `users` ON `messages`.`uid` = `users`.`uid` WHERE `messages`.`ch_id` = '" . $conn->real_escape_string($channel_id) . "'";
+        if ($announcement) {
+            $sql .= " AND (`messages`.`flags` & (1 << 0)) = 1";
+        }
         if (isset($after_m_id) && $after_m_id != null) {
             $sql .= " AND `messages`.`send_date` >= ( SELECT `send_date` FROM `messages` WHERE `m_id` = '" . $conn->real_escape_string($after_m_id) . "' LIMIT 1 )";
             $sql .= " ORDER BY `messages`.`send_date` ASC LIMIT 10;";
@@ -115,7 +136,7 @@ class Message
         return $messages;
     }
 
-    public static function get_before($channel_id, $before_m_id)
+    public static function get_before($channel_id, $before_m_id, $announcement = false)
     {
         global $user;
         if (!does_user_have_access($user->uid, $channel_id)) {
@@ -123,6 +144,9 @@ class Message
         }
         global $conn;
         $sql = "SELECT `messages`.*, `users`.`first_name`, `users`.`last_name`, `users`.`display_name` FROM `messages` LEFT JOIN `users` ON `messages`.`uid` = `users`.`uid` WHERE `messages`.`ch_id` = '" . $conn->real_escape_string($channel_id) . "'";
+        if ($announcement) {
+            $sql .= " AND (`messages`.`flags` & (1 << 0)) = 1";
+        }
         $sql .= " AND `messages`.`send_date` <= ( SELECT `send_date` FROM `messages` WHERE `m_id` = '" . $conn->real_escape_string($before_m_id) . "' LIMIT 1 )";
         $sql .= " ORDER BY `messages`.`send_date` DESC LIMIT 10;";
 
