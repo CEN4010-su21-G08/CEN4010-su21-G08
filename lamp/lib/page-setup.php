@@ -31,5 +31,8 @@
         }
     }
 
+    $sidebar_shown = false;
+    require_once('common/sidebar.php');
+
     
 

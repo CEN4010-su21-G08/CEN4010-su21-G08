@@ -1,6 +1,7 @@
 <?php
 // define("app_page", true);
 global $is_logged_in;
+global $center_page;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,3 +42,7 @@ global $is_logged_in;
       </div>
     </nav>
   </header>
+  <main>
+    <?php if (!isset($include_sidebar)) {
+      ?> <div class="main-content<?php if (isset($center_page)) { ?> main-content-center<?php }?>"><?php
+    } ?>
