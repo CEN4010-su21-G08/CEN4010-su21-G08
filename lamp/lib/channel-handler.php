@@ -18,16 +18,17 @@
            }
 
            $channel = $result->fetch_assoc();
-           $name = null;
 
-           $this->$ch_id = $channel['ch_id'];
-           $this->$name = $channel['name'];
+           $this->ch_id = $channel['ch_id'];
+           $this->name = $channel['name'];
            $this->type = $channel['type'];
            $this->course_id = $channel['course_id'];
         }
 
         public static function get_course_channels($course_id)
         {
+            global $conn;
+
             $sql = "SELECT * FROM `channels` WHERE `course_id` = '" . $conn->real_escape_string($course_id) . "'";
             $result = $conn->query($sql);
 

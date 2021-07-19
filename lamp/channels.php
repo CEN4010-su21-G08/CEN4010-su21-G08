@@ -4,6 +4,7 @@
 <?php require_once("lib/page-setup.php"); ?>
 <?php include('lib/message-handler.php'); ?>
 <?php include('lib/channel-handler.php'); ?>
+<?php include('lib/course-handler.php');  ?>
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         //send_message();
@@ -17,6 +18,16 @@
         header("Location: courses.php");
     }
 
+    $course_channels = Channel::get_course_channels($channel->course_id);
+    $mychannels = array();
+    foreach ($course_channels as $course_channel_id)
+    {
+        if (does_user_have_access($_SESSION['uid'], $course_channel_id))
+        {
+            $mychannels[] = new Channel($course_channel_id);
+        }
+    }
+
     $has_access = does_user_have_access($_SESSION['uid'], $channel_id);
     
 
@@ -26,9 +37,34 @@
 if (!$has_access) {?>
         <div class="alert alert-danger" style="margin: 20px;">You don't have access to this channel or it doesn't exist</div>
     <?php } else {?>
+<!-- Side navigation -->
+<div class="sidenav">
+    <?php
+    foreach ($mychannels as $mychannel)
+    {
+        if (!isset($mychannel->name))
+        {
+            ?> <a href="channels.php?ch_id=<?php echo(urlencode(htmlspecialchars($mychannel->ch_id)));?>">Chat</a><?php
+        }
+        else
+        {
+            ?> <a href="channels.php?ch_id=<?php echo(urlencode(htmlspecialchars($mychannel->ch_id)));?>"><?php echo(htmlspecialchars($mychannel->name)); ?></a><?php
+        }
+    }
+    ?>
+</div>
 Channels
 <div>
-<h2>Test Channel</h2>
+<h2>
+    <?php
+        if (!isset($channel->name)) {
+            echo("Chat");
+        }
+        else {
+            echo(htmlspecialchars($mychannel->name));
+        }
+    ?>
+ </h2>
 <div class="messages">
     <?php 
         $messages = get_messages();
