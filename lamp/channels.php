@@ -18,6 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     $course = new Course($channel->course_id);
     $is_instructor = is_user_instructor($course->course_id);
 
+    $is_primary_course_chat = $course->course_id == $channel_id;
+    $announcement = isset($_GET['announcements']) && $is_primary_course_chat;
+
 
     $has_access = does_user_have_access($_SESSION['uid'], $channel_id);
     include('./common/header.php');
@@ -33,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 <h2>
                     <?php
                     if (!isset($channel->name)) {
-                        echo ($course->course_code . '-' . $course->section_number . " Main Chat");
+                        echo ($course->course_code . '-' . $course->section_number . (isset($_GET['announcements']) ? " Announcements" : " Main Chat"));
                     } else {
                         echo (htmlspecialchars($channel->name));
                     }
@@ -48,16 +51,30 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 </div>
                 <div class="messages"></div>
             </div>
+            <?php if (!$announcement || ($announcement && $is_instructor)) { ?>
             <form method="post" id="send_message_form" action="<?php echo (htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
                 <div class="form-group">
-                    <input class="form-control" name="message" type="text" placeholder="Message" />
-                    <button style="margin-top: 5px;" class="btn btn-primary" type="submit">Send Message</button>
+                    <input class="form-control" name="message" type="text" placeholder="<?= $announcement ? "Announcement" : "Message" ?>" />
+                    <?php if ($is_primary_course_chat && $is_instructor && !$announcement) { ?>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" name="send_as_announcement" id="send_as_announcement">
+                            <label class="form-check-label" for="send_as_announcement">
+                                Send as announcement
+                            </label>
+                        </div>
+                    <?php } ?>
+                    <button style="margin-top: 5px;" class="btn btn-primary" type="submit">Send <?= $announcement ? "Announcement" : "Message" ?></button>
                 </div>
             </form>
+            <?php } ?>
 
             <script>
+                <?php if (!$announcement || ($announcement && $is_instructor)) { ?>
                 $send_input = $("input[name=message]");
-                $send_button = $("button[type=submit]")
+                $send_button = $("button[type=submit]");
+                <?php if (!$announcement && $is_instructor) { ?>
+                    $send_as_announcement = $("input[type=checkbox]");
+                <?php } ?>
                 $('#send_message_form').submit(event => {
                     event.preventDefault();
                     let data = $('#send_message_form').serialize();
@@ -69,9 +86,15 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     $send_button.addClass("disabled");
                     $send_button.attr("disabled", "disabled");
                     $send_button.text("Sending...");
+                    <?php if (!$announcement && $is_instructor) { ?>
+                        $send_as_announcement.addClass("disabled");
+                        $send_as_announcement.attr("disabled", "disabled");
+                        $is_announcement = $send_as_announcement.is(":checked");
+                    <?php } ?>
+                    
 
                     $('#send_message_form').children("input[name=message]").addClass("disabled");
-                    $.post("messages.php?ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>"), data, () => {
+                    $.post("messages.php?<?php if ($is_primary_course_chat && !$announcement && $is_instructor) { ?>" + ($is_announcement ? "announcements&" : "") + "<?php } ?><?= ($announcement && $is_instructor) ? "announcements&" : ""?>ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>"), data, () => {
                         $send_input.val("");
                         getNewMessages(() => {
                             $send_input.removeClass("disabled");
@@ -79,10 +102,18 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                             $send_button.removeClass("disabled");
                             $send_button.attr("disabled", null);
                             $send_button.text("Send Message");
+                            <?php if (!$announcement && $is_instructor) { ?>
+                                $send_as_announcement.prop("checked", false);
+                                $send_as_announcement.removeClass("disabled");
+                                $send_as_announcement.attr("disabled", null);
+                            <?php } ?>
                         });
 
                     })
                 });
+
+                <?php } ?>
+
                 let last_message_id = null;
                 let messages = [];
                 getNewMessages();
@@ -109,7 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     }
                     let oldest_message_id = oldest_message.m_id;
 
-                    $.get("messages.php?ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>") + ("&start_before=" + encodeURIComponent(oldest_message_id)), (data) => {
+                    $.get("messages.php?<?= $announcement ? 'announcements&' : ''; ?>ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>") + ("&start_before=" + encodeURIComponent(oldest_message_id)), (data) => {
                         console.log('did it work? older')
                         console.log(data);
                         // let newMessages = JSON.parse(data);
@@ -141,7 +172,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 }
 
                 function getNewMessages(done) {
-                    $.get("messages.php?ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>") + (last_message_id ? ("&start_after=" + encodeURIComponent(last_message_id)) : ""), (data) => {
+                    $.get("messages.php?<?= $announcement ? 'announcements&' : ''; ?>ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>") + (last_message_id ? ("&start_after=" + encodeURIComponent(last_message_id)) : ""), (data) => {
                         console.log('did it work?')
                         console.log(data);
                         // let newMessages = JSON.parse(data);
@@ -168,9 +199,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                         } else {
                             last_message_id = messages[messages.length - 1].m_id;
                             messages.forEach(m => {
-                                let $m_el = $('<div class="message"><div class="message_author"></div><div class="message_content"></div></div>');
+                                let $m_el = $('<div class="message"><div class="message_author"></div><span class="empty_m_badge"></span><div class="message_content"></div></div>');
                                 $m_el.children(".message_content").text(m.message);
                                 $m_el.children(".message_author").text(m.display_name);
+                                if (m.flags) {
+                                    if (parseInt(m.flags) & (1 << 0)) {
+                                        let $badge = $m_el.children(".empty_m_badge")
+                                        $badge.addClass("badge bg-primary announcement");
+                                        $badge.text("Announcement");
+                                        $badge.removeClass("empty_m_badge");
+
+                                        $m_el.addClass("announcement-message");
+                                    }
+                                }
                                 $('.messages').append($m_el)
                             })
                             if (messages.length == 0) {

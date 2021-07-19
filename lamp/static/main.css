@@ -7,13 +7,6 @@
     background-color: #002160;
 }
 
-aside.sidebar, aside.sidebar>div {
-    background-color: #cccccc;
-    justify-content: center;
-    align-content: center;
-    display: flex;
-}
-
 div.container-fluid.main-content-div {
     padding-right: 0px;
     padding-left: 0px;
@@ -123,21 +116,21 @@ main div.main-content {
     overflow-y: auto;
 }
 
-.bi {
+.sidebar .bi {
     vertical-align: -.125em;
     pointer-events: none;
     fill: currentColor;
 }
 
-.dropdown-toggle {
+.sidebar .dropdown-toggle {
     outline: 0;
 }
 
-.nav-flush .nav-link {
+.sidebar .nav-flush .nav-link {
     border-radius: 0;
 }
 
-.btn-toggle {
+.sidebar .btn-toggle {
     display: inline-flex;
     align-items: center;
     padding: .25rem .5rem;
@@ -147,12 +140,12 @@ main div.main-content {
     border: 0;
 }
 
-.btn-toggle:hover, .btn-toggle:focus {
+.sidebar .btn-toggle:hover, .btn-toggle:focus {
     color: rgba(0, 0, 0, .85);
-    background-color: #d2f4ea;
+    background-color: #a1d0ff;
 }
 
-.btn-toggle::before {
+.sidebar .btn-toggle::before {
     width: 1.25em;
     line-height: 0;
     content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
@@ -160,15 +153,15 @@ main div.main-content {
     transform-origin: .5em 50%;
 }
 
-.btn-toggle[aria-expanded="true"] {
+.sidebar .btn-toggle[aria-expanded="true"] {
     color: rgba(0, 0, 0, .85);
 }
 
-.btn-toggle[aria-expanded="true"]::before {
+.sidebar .btn-toggle[aria-expanded="true"]::before {
     transform: rotate(90deg);
 }
 
-.btn-toggle-nav a {
+.sidebar .btn-toggle-nav a {
     display: inline-flex;
     padding: .1875rem .5rem;
     margin-top: .125rem;
@@ -176,19 +169,23 @@ main div.main-content {
     text-decoration: none;
 }
 
-.btn-toggle-nav a:hover, .btn-toggle-nav a:focus {
-    background-color: #d2f4ea;
+.sidebar .btn-toggle-nav a:hover, .btn-toggle-nav a:focus {
+    background-color: #a1d0ff;
+}
+
+.sidebar .active {
+    background-color: #a1d0ff;
 }
 
 .scrollarea {
     overflow-y: auto;
 }
 
-.fw-semibold {
+.sidebar .fw-semibold {
     font-weight: 600;
 }
 
-.lh-tight {
+.sidebar .lh-tight {
     line-height: 1.25;
 }
 
@@ -250,4 +247,20 @@ form.sign-in-form, form.sign-up-form {
 
 .link-no-underline {
     text-decoration: none;
+}
+
+.message_author {
+    display: inline;
+    margin-right: 15px;
+}
+.badge .announcement {
+    margin-left: 15px;
+    display: inline-block;
+}
+.message {
+    padding: 10px;
+}
+.announcement-message {
+    background-color: #e6bc04;
+    border-radius: 3px;
 }
