@@ -5,24 +5,31 @@
         public $type = null;
         public $course_id = null;
         
-        function __construct($ch_id)
+        function __construct($ch_id, $type = null, $name = null, $course_id = null)
         {
-           global $conn;
-           
-           $sql = "SELECT * FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
-           $result = $conn->query($sql);
+            if ($type == null) {
+                global $conn;
+                
+                $sql = "SELECT * FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+                $result = $conn->query($sql);
 
-           $numRows = mysqli_num_rows($result);
-           if ($numRows <= 0) {
-               return null;
-           }
+                $numRows = mysqli_num_rows($result);
+                if ($numRows <= 0) {
+                    return null;
+                }
 
-           $channel = $result->fetch_assoc();
+                $channel = $result->fetch_assoc();
 
-           $this->ch_id = $channel['ch_id'];
-           $this->name = $channel['name'];
-           $this->type = $channel['type'];
-           $this->course_id = $channel['course_id'];
+                $this->ch_id = $channel['ch_id'];
+                $this->name = $channel['name'];
+                $this->type = $channel['type'];
+                $this->course_id = $channel['course_id'];
+            } else {
+                $this->ch_id = $ch_id;
+                $this->name = $name;
+                $this->type =$type;
+                $this->course_id =$course_id;
+            }
         }
 
         public static function get_course_channels($course_id)
@@ -39,13 +46,13 @@
 
             $out = array();
             while ($row = $result->fetch_assoc()) {
-                $out[] = $row['ch_id'];
+                $out[] = new Channel($row['ch_id'], $row['type'], $row['name'], $row['course_id']);
             }
 
             return $out;
         }
 
-        public static function get_users_channels_in_course($uid, $course_id)
+        public static function get_users_channels_in_course($uid, $course_id, $only_groups = false)
         {
             global $conn;
 
@@ -58,13 +65,14 @@
             }
             else
             {
-            $out = array();
-            while ($row = $result->fetch_assoc()) {
-                $out[] = $row['ch_id'];
+                $out = array();
+                while ($row = $result->fetch_assoc()) {
+                    $out[] = new Channel($row['ch_id'], $row['type'], $row['name'], $row['course_id']);
+                }
             }
+            if (!$only_groups) {
+                $out[] = $course_id;
             }
-
-            $out[] = $course_id;
 
             return $out;
         }
