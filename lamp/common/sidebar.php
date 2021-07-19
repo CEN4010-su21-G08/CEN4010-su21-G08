@@ -4,6 +4,19 @@ function show_sidebar($heading, $course_name, $course_id, $groups) {
     global $sidebar_shown;
     global $center_page;
     $sidebar_shown = true;
+
+    $active_page = null;
+    // if ()
+    $url_parts = explode("/", $_SERVER["PHP_SELF"]);
+    $filename = $url_parts[count($url_parts) - 1];
+    
+    if ($filename == 'course-info.php' && isset($_GET['ch_id']) && $course_id == $_GET['ch_id']) {
+        $active_page = 'course-info';
+    } else if ($filename == 'channels.php' && isset($_GET['announcements']) && isset($_GET['ch_id']) && $course_id == $_GET['ch_id']) {
+        $active_page = 'announcements';
+    } else if ($filename == 'channels.php' && isset($_GET['ch_id']) && $course_id == $_GET['ch_id']) {
+        $active_page = 'chat';
+    } 
 ?>
     <div class="sidebar">
         <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
@@ -20,22 +33,22 @@ function show_sidebar($heading, $course_name, $course_id, $groups) {
                     </button>
                     <div class="collapse show" id="home-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="course-info.php?course_id=<?= urlencode($course_id); ?>" class="link-dark rounded">About Course</a></li>
-                            <li><a onclick="return false" href="channels.php?announcements&ch_id=<?= urlencode($course_id); ?>" class="link-dark rounded disabled">Announcements</a></li>
-                            <li><a href="channels.php?ch_id=<?= urlencode($course_id); ?>" class="link-dark rounded">Course Chat</a></li>
+                            <li><a href="course-info.php?course_id=<?= urlencode($course_id); ?>" class="<?= $active_page == 'course-info' ? 'active ' : '' ?>link-dark rounded">About Course</a></li>
+                            <li><a href="channels.php?announcements&ch_id=<?= urlencode($course_id); ?>" class="<?= $active_page == 'announcements' ? 'active ' : '' ?>link-dark rounded disabled">Announcements</a></li>
+                            <li><a href="channels.php?ch_id=<?= urlencode($course_id); ?>" class="<?= $active_page == 'chat' ? 'active ' : '' ?>link-dark rounded">Course Chat</a></li>
                         </ul>
                     </div>
                 </li>
                 <li class="mb-1">
-                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
+                    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="true">
                         Groups
                     </button>
-                    <div class="collapse" id="dashboard-collapse">
+                    <div class="collapse show" id="dashboard-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             <?php if (count($groups) >= 1) { 
                                 foreach($groups as $group) {
                                     ?> 
-                                    <li><a href="channels.php?ch_id=<?= urlencode($group->ch_id); ?>" class="link-dark rounded"><?= $group->name; ?></a></li>
+                                    <li><a href="channels.php?ch_id=<?= urlencode($group->ch_id); ?>" class="<?= $active_page == null && isset($_GET['ch_id']) && $group->ch_id == $_GET['ch_id'] ? 'active ' : '' ?>link-dark rounded"><?= $group->name; ?></a></li>
                                 <?php } ?>
                             <?php } else { ?>
                                 <li><span class="sidebar-no-link">No groups</span></li>
