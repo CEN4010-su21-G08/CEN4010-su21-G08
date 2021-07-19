@@ -9,7 +9,7 @@
         {
             global $conn;
 
-            $sql = "SELECT * FROM `courseMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($course_id) . "'";
+            $sql = "SELECT * FROM `courseMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
             $result = $conn->query($sql);
             // $statement = $conn->prepare($sql);
 
@@ -24,9 +24,9 @@
 
             $courseMembership = $result->fetch_assoc();
 
-            $this->$uid = courseMembership['uid'];
-            $this->ch_id = courseMembership['ch_id'];
-            $this->type = courseMembership['type'];
+            $this->$uid = $courseMembership['uid'];
+            $this->ch_id = $courseMembership['ch_id'];
+            $this->type = $courseMembership['type'];
         }
 
         public static function is_user_member($uid, $ch_id) {
