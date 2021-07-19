@@ -133,3 +133,20 @@ body {
     .sidenav {padding-top: 15px;}
     .sidenav a {font-size: 18px;}
   }
+.signoutdiv {
+    font-family: Roboto, arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+}
+
+.signinupdiv {
+    text-align: center;
+    align-content: center;
+}
+
+.maintitleheader {
+    font-family: Roboto, arial, sans-serif;
+    color: #003366;
+    font-weight: bold;
+    font-size: 18px;
+}
