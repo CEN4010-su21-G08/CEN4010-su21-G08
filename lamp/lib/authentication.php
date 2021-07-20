@@ -371,7 +371,7 @@
 
     function is_user_instructor($course_id)
     {
-        global $conn;
+        include_once("lib/course-handler.php");
         $uid = $_SESSION['uid'];
 
         $Membership = new CourseMembership($uid, $course_id);

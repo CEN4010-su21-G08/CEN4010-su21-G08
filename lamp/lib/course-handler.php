@@ -1,5 +1,4 @@
 <?php
-
     class CourseMembership {
         public $uid = null;
         public $ch_id = null;
@@ -24,7 +23,7 @@
 
             $courseMembership = $result->fetch_assoc();
 
-            $this->$uid = $courseMembership['uid'];
+            $this->uid = $courseMembership['uid'];
             $this->ch_id = $courseMembership['ch_id'];
             $this->role = $courseMembership['role'];
         }
