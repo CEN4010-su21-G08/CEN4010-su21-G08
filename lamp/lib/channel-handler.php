@@ -91,11 +91,14 @@
             
             $ch_id = generateRandomString();
 
+            $sql = "INSERT INTO `channels` (`ch_id`,";
+            if (isset($name)) $sql .= "`name`,";
+            $sql .= "`type`,`course_id`) VALUES (";
             $sql .= "'" . $conn->real_escape_string($ch_id) . "'" . ", ";
             if (isset($name))
                 $sql .= "'" . $conn->real_escape_string($name) . "'" . ", ";
             $sql .= "'" . $conn->real_escape_string($type) . "'" . ", ";
-            $sql .= "'" . $conn->real_escape_string($course_id) . "'" . ", ";
+            $sql .= "'" . $conn->real_escape_string($course_id) . "'" . ") ";
 
             $conn->query($sql);
 

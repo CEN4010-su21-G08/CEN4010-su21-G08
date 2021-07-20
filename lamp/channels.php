@@ -26,8 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     <?php } else {
         $groups = Channel::get_users_channels_in_course($_SESSION['uid'], $channel->course_id, true);
     ?>
-        <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $channel->course_id, $groups); ?>
-
+        <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $channel->course_id, $groups, $is_instructor); ?>
         <div class="channels_main">
             <div>
                 <h2>
@@ -41,8 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 </h2>
                 <?php
                     if ($is_instructor)
-                        ?><h2>INSTRUCTOR VIEW</h2><?php;
-                ?>
+                    { ?>
+                        <h2>INSTRUCTOR VIEW</h2>
+                    <?php } ?>
                 <div class="older">
                     <button id="older-btn" class="btn btn-outline-secondary" onclick="getOlderMessages();">Load earlier messages</button>
                 </div>

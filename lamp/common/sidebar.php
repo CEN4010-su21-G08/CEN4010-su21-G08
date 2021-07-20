@@ -1,6 +1,6 @@
 <?php
 // Sidebar from https://getbootstrap.com/docs/5.0/examples/sidebars/# 
-function show_sidebar($heading, $course_name, $course_id, $groups) {
+function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructor) {
     global $sidebar_shown;
     global $center_page;
     $sidebar_shown = true;
@@ -43,6 +43,13 @@ function show_sidebar($heading, $course_name, $course_id, $groups) {
                         </ul>
                     </div>
                 </li>
+                <?php
+                if ($is_instructor)
+                { ?>
+                <li class="mb-1">
+                    <a href="create-group.php?course_id=<?= urlencode($course_id);?>" class="link-dark rounded">Create Group</a>
+                </li>
+                <?php } ?>
             </ul>
         </div>
     </div>

@@ -3,7 +3,7 @@
     class CourseMembership {
         public $uid = null;
         public $ch_id = null;
-        public $type = null;
+        public $role = null;
 
         function __construct($uid, $ch_id) 
         {
@@ -26,7 +26,7 @@
 
             $this->$uid = $courseMembership['uid'];
             $this->ch_id = $courseMembership['ch_id'];
-            $this->type = $courseMembership['type'];
+            $this->role = $courseMembership['role'];
         }
 
         public static function is_user_member($uid, $ch_id) {
@@ -114,6 +114,27 @@
             $statement->bind_param("ssi", $uid, $ch_id, $role);
             $statement->execute();
         }
+
+        public static function get_users_in_course($course_id)
+        {
+            global $conn;
+
+            $sql = "SELECT `uid` FROM `courseMembership` WHERE `courseMembership`.`ch_id` = '" . $conn->real_escape_string($course_id) . "'";
+
+            $result = $conn->query($sql);
+
+            $numRows = mysqli_num_rows($result);
+            if ($numRows <= 0) {
+                return array();
+            }
+
+            $out = array();
+            while ($row = $result->fetch_assoc()) {
+                $out[] = new User($row['uid']);
+            }
+
+            return $out;
+        }
     };
 
     class Course {
@@ -163,9 +184,8 @@
 
             return $courses;
         }
+
         public static function create_course() {}
         public static function update_course() {}
     };
-
-    
 ?>
