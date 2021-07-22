@@ -193,7 +193,51 @@
             return $courses;
         }
 
+        public static function search_course_names($course_code = "", $section_number = "") {
+            if ($course_code == "" && $section_number == "") {
+                return;
+            }
+            if (!is_string($course_code) || !is_string($section_number)) {
+                return;
+            }
+            $course_code = strtoupper($course_code);
+            $section_number = strtoupper($section_number);
+
+            global $conn;
+            $sql = "SELECT `course_code`, `section_number`, `course_id` FROM `courses` WHERE";
+            if ($course_code != "") {
+                $sql .= " `course_code` LIKE '" . $conn->real_escape_string($course_code) . "%'";
+            }
+            if ($course_code != "" && $section_number != "") {
+                $sql .= " AND";
+            }
+            if ($section_number != "") {
+                $sql .= " `section_number` LIKE '" . $conn->real_escape_string($section_number) . "%'";
+            }
+            $sql .= " LIMIT 30";
+            $result = $conn->query($sql);
+
+            $results = [];
+            while ($row = $result->fetch_assoc()) {
+                $results[] = new CourseSearchResult($row['course_code'], $row['section_number'], $row['course_id']);
+            }
+
+            return $results;
+        }
+
         public static function create_course() {}
         public static function update_course() {}
     };
+
+    class CourseSearchResult {
+        public $course_code = null;
+        public $section_number = null;
+        public $course_id = null;
+
+        public function __construct($course_code, $section_number, $course_id) {
+            $this->course_code = $course_code;
+            $this->section_number = $section_number;
+            $this->course_id = $course_id;
+        }
+    }
 ?>
