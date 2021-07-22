@@ -71,8 +71,6 @@
                     $sql .= "`email` = '" . $conn->real_escape_string($email) . "'";
                 }
 
-                error_log($sql);
-
                 $result = $conn->query($sql);
                 $numRows = mysqli_num_rows($result);
                 if ($numRows > 0) {

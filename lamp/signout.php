@@ -1,6 +1,7 @@
 <?php
     $page_title = "Signed out";
     $auth_needed = false;
+    $center_page = true;
 ?>
 <?php require_once("lib/page-setup.php"); ?>
 <?php

@@ -5,7 +5,6 @@
 require_once("lib/page-setup.php");
 require_once('lib/message-handler.php');
  ?>
-
 <?php 
     $announcement = isset($_GET['announcements']);
     $channel_id = parse_get_input("ch_id", true);

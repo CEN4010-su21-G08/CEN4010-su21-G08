@@ -1,4 +1,6 @@
 {
     "html.format.extraLiners": "",
-    "html.format.indentInnerHtml": true
+    "html.format.indentInnerHtml": true,
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false
 }
