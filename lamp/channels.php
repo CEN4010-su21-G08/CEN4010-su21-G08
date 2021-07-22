@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                         $send_as_announcement.attr("disabled", "disabled");
                         $is_announcement = $send_as_announcement.is(":checked");
                     <?php } ?>
-                    
+
 
                     $('#send_message_form').children("input[name=message]").addClass("disabled");
                     $.post("messages.php?<?php if ($is_primary_course_chat && !$announcement && $is_instructor) { ?>" + ($is_announcement ? "announcements&" : "") + "<?php } ?><?= ($announcement && $is_instructor) ? "announcements&" : ""?>ch_id=" + encodeURIComponent("<?php echo(htmlspecialchars($_GET['ch_id'])); ?>"), data, () => {

@@ -47,7 +47,7 @@ function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructo
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             <?php if (count($groups) >= 1) {
         foreach ($groups as $group) {
-            ?> 
+            ?>
                                     <li><a href="channels.php?ch_id=<?= urlencode($group->ch_id); ?>" class="<?= $active_page == null && isset($_GET['ch_id']) && $group->ch_id == $_GET['ch_id'] ? 'active ' : '' ?>link-dark rounded"><?= $group->name; ?></a></li>
                                 <?php
         } ?>

@@ -47,7 +47,7 @@
                 <div class="form-group">
                     <label class="form-label" for="namesel">Display Name</label>
                     <select required id="namesel" name="display_name" class="form-select">
-                        
+
                     <?php $selected_dn = "0";
         if ($error) {
             $selected_dn = $_POST['display_name'] ? htmlspecialchars($_POST['display_name']) : '0';
@@ -103,7 +103,7 @@
     } else {
         ?>
     <?php render_signup_page(); ?>
-    
+
 <?php
     } ?>
 <?php include('common/footer.php'); ?>
