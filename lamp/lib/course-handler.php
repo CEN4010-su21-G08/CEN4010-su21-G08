@@ -87,7 +87,7 @@
             // $rows = $result->fetch_all(MYSQLI_ASSOC);
             $out = array();
             while ($row = $result->fetch_assoc()) {
-                $c = new Course();
+                $c = new CourseWithMembership();
                 $c->course_code = $row['course_code'];
                 $c->section_number = $row['section_number'];
                 $c->instructor_email = $row['instructor_email'];
@@ -95,11 +95,12 @@
                 $c->instructor_name = $row['instructor_name'];
                 $c->course_description = $row['course_description'];
                 $c->course_name = $row['course_name'];
+                $c->role = $row['role'];
                 $out[] = $c;
             }
 
             return $out;
-        } // includes instance of Course
+        } // includes instance of CourseWithMembership
         
         public static function create_membership($uid, $ch_id, $role = 1)
         {
@@ -114,6 +115,14 @@
             $statement->execute();
         }
     };
+
+    class CourseWithMembership extends Course {
+        public $role = null;
+
+        public function is_instructor () {
+            return ($this->role == 2);
+        }
+    }
 
     class Course {
         public $course_code = null;

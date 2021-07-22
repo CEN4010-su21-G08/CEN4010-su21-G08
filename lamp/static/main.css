@@ -264,3 +264,23 @@ form.sign-in-form, form.sign-up-form {
     background-color: #e6bc04;
     border-radius: 3px;
 }
+
+.g-icon-2 svg {
+    vertical-align: unset;
+}
+
+.homepageheader {
+    font-family: Roboto, arial, sans-serif;
+    color: #003366;
+    font-weight: bold;
+    font-size: 32px;
+}
+
+.course-list {
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.main-content {
+    min-width: 30%;
+}
