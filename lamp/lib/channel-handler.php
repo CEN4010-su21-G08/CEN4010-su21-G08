@@ -1,15 +1,17 @@
 <?php
-    class Channel {
+
+    class Channel
+    {
         public $ch_id = null;
         public $name = null;
         public $type = null;
         public $course_id = null;
-        
-        function __construct($ch_id, $type = null, $name = null, $course_id = null)
+
+        public function __construct($ch_id, $type = null, $name = null, $course_id = null)
         {
             if ($type == null) {
                 global $conn;
-                
+
                 $sql = "SELECT * FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
                 $result = $conn->query($sql);
 
@@ -62,9 +64,7 @@
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
                 $out = array();
-            }
-            else
-            {
+            } else {
                 $out = array();
                 while ($row = $result->fetch_assoc()) {
                     $out[] = new Channel($row['ch_id'], $row['type'], $row['name'], $row['course_id']);
@@ -86,17 +86,21 @@
             course_id: required
             */
 
-            if (!isset($course_id))
+            if (!isset($course_id)) {
                 throwError(500, "Error creating channel: course does not exist");
-            
+            }
+
             $ch_id = generateRandomString();
 
             $sql = "INSERT INTO `channels` (`ch_id`,";
-            if (isset($name)) $sql .= "`name`,";
+            if (isset($name)) {
+                $sql .= "`name`,";
+            }
             $sql .= "`type`,`course_id`) VALUES (";
             $sql .= "'" . $conn->real_escape_string($ch_id) . "'" . ", ";
-            if (isset($name))
+            if (isset($name)) {
                 $sql .= "'" . $conn->real_escape_string($name) . "'" . ", ";
+            }
             $sql .= "'" . $conn->real_escape_string($type) . "'" . ", ";
             $sql .= "'" . $conn->real_escape_string($course_id) . "'" . ") ";
 
@@ -107,5 +111,7 @@
             return $channel;
         }
 
-        public static function delete_channel() {}
+        public static function delete_channel()
+        {
+        }
     }

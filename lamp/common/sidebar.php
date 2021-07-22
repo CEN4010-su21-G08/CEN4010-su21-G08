@@ -1,6 +1,7 @@
 <?php
-// Sidebar from https://getbootstrap.com/docs/5.0/examples/sidebars/# 
-function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructor) {
+// Sidebar from https://getbootstrap.com/docs/5.0/examples/sidebars/#
+function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructor)
+{
     global $sidebar_shown;
     global $center_page;
     $sidebar_shown = true;
@@ -9,15 +10,14 @@ function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructo
     // if ()
     $url_parts = explode("/", $_SERVER["PHP_SELF"]);
     $filename = $url_parts[count($url_parts) - 1];
-    
+
     if ($filename == 'course-info.php' && isset($_GET['ch_id']) && $course_id == $_GET['ch_id']) {
         $active_page = 'course-info';
-    } else if ($filename == 'channels.php' && isset($_GET['announcements']) && isset($_GET['ch_id']) && $course_id == $_GET['ch_id']) {
+    } elseif ($filename == 'channels.php' && isset($_GET['announcements']) && isset($_GET['ch_id']) && $course_id == $_GET['ch_id']) {
         $active_page = 'announcements';
-    } else if ($filename == 'channels.php' && isset($_GET['ch_id']) && $course_id == $_GET['ch_id']) {
+    } elseif ($filename == 'channels.php' && isset($_GET['ch_id']) && $course_id == $_GET['ch_id']) {
         $active_page = 'chat';
-    } 
-?>
+    } ?>
     <div class="sidebar">
         <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
             <a href="#" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
@@ -45,20 +45,21 @@ function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructo
                     </button>
                     <div class="collapse show" id="dashboard-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <?php if (count($groups) >= 1) { 
-                                foreach($groups as $group) {
-                                    ?> 
+                            <?php if (count($groups) >= 1) {
+        foreach ($groups as $group) {
+            ?> 
                                     <li><a href="channels.php?ch_id=<?= urlencode($group->ch_id); ?>" class="<?= $active_page == null && isset($_GET['ch_id']) && $group->ch_id == $_GET['ch_id'] ? 'active ' : '' ?>link-dark rounded"><?= $group->name; ?></a></li>
-                                <?php } ?>
-                            <?php } else { ?>
+                                <?php
+        } ?>
+                            <?php
+    } else { ?>
                                 <li><span class="sidebar-no-link">No groups</span></li>
                             <?php } ?>
                         </ul>
                     </div>
                 </li>
                 <?php
-                if ($is_instructor)
-                { ?>
+                if ($is_instructor) { ?>
                 <li class="mb-1">
                     <a href="create-group.php?course_id=<?= urlencode($course_id);?>" class="link-dark rounded">Create Group</a>
                 </li>
@@ -68,4 +69,5 @@ function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructo
     </div>
     <div class="main-content<?php if (isset($center_page)) { ?> main-content-center<?php } ?>">
 
-    <?php } ?>
+    <?php
+} ?>

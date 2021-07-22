@@ -27,23 +27,20 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     if (!$has_access) { ?>
         <div class="alert alert-danger" style="margin: 20px;">You don't have access to this channel or it doesn't exist</div>
     <?php } else {
-        $groups = Channel::get_users_channels_in_course($_SESSION['uid'], $channel->course_id, true);
-    ?>
+        $groups = Channel::get_users_channels_in_course($_SESSION['uid'], $channel->course_id, true); ?>
         <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $channel->course_id, $groups, $is_instructor); ?>
         <div class="channels_main">
             <div>
                 <h2>
                     <?php
                     if (!isset($channel->name)) {
-                        echo ($course->course_code . '-' . $course->section_number . (isset($_GET['announcements']) ? " Announcements" : " Main Chat"));
+                        echo($course->course_code . '-' . $course->section_number . (isset($_GET['announcements']) ? " Announcements" : " Main Chat"));
                     } else {
-                        echo (htmlspecialchars($channel->name));
-                    }
-                    ?>
+                        echo(htmlspecialchars($channel->name));
+                    } ?>
                 </h2>
                 <?php
-                    if ($is_instructor)
-                    { ?>
+                    if ($is_instructor) { ?>
                         <h2>INSTRUCTOR VIEW</h2>
                     <?php } ?>
                 <div class="older">
@@ -52,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 <div class="messages"></div>
             </div>
             <?php if (!$announcement || ($announcement && $is_instructor)) { ?>
-            <form method="post" id="send_message_form" action="<?php echo (htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
+            <form method="post" id="send_message_form" action="<?php echo(htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
                 <div class="form-group">
                     <input class="form-control" name="message" type="text" placeholder="<?= $announcement ? "Announcement" : "Message" ?>" />
                     <?php if ($is_primary_course_chat && $is_instructor && !$announcement) { ?>
@@ -94,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     
 
                     $('#send_message_form').children("input[name=message]").addClass("disabled");
-                    $.post("messages.php?<?php if ($is_primary_course_chat && !$announcement && $is_instructor) { ?>" + ($is_announcement ? "announcements&" : "") + "<?php } ?><?= ($announcement && $is_instructor) ? "announcements&" : ""?>ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>"), data, () => {
+                    $.post("messages.php?<?php if ($is_primary_course_chat && !$announcement && $is_instructor) { ?>" + ($is_announcement ? "announcements&" : "") + "<?php } ?><?= ($announcement && $is_instructor) ? "announcements&" : ""?>ch_id=" + encodeURIComponent("<?php echo(htmlspecialchars($_GET['ch_id'])); ?>"), data, () => {
                         $send_input.val("");
                         getNewMessages(() => {
                             $send_input.removeClass("disabled");
@@ -140,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     }
                     let oldest_message_id = oldest_message.m_id;
 
-                    $.get("messages.php?<?= $announcement ? 'announcements&' : ''; ?>ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>") + ("&start_before=" + encodeURIComponent(oldest_message_id)), (data) => {
+                    $.get("messages.php?<?= $announcement ? 'announcements&' : ''; ?>ch_id=" + encodeURIComponent("<?php echo(htmlspecialchars($_GET['ch_id'])); ?>") + ("&start_before=" + encodeURIComponent(oldest_message_id)), (data) => {
                         console.log('did it work? older')
                         console.log(data);
                         // let newMessages = JSON.parse(data);
@@ -172,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 }
 
                 function getNewMessages(done) {
-                    $.get("messages.php?<?= $announcement ? 'announcements&' : ''; ?>ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>") + (last_message_id ? ("&start_after=" + encodeURIComponent(last_message_id)) : ""), (data) => {
+                    $.get("messages.php?<?= $announcement ? 'announcements&' : ''; ?>ch_id=" + encodeURIComponent("<?php echo(htmlspecialchars($_GET['ch_id'])); ?>") + (last_message_id ? ("&start_after=" + encodeURIComponent(last_message_id)) : ""), (data) => {
                         console.log('did it work?')
                         console.log(data);
                         // let newMessages = JSON.parse(data);
@@ -224,7 +221,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     });
                 }
             </script>
-        <?php } ?>
+        <?php
+    } ?>
         </div>
         <?php include('common/footer.php'); ?>
     <?php } ?>

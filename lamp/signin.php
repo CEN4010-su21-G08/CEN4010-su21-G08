@@ -4,10 +4,10 @@
     $center_page = true;
 ?>
 <?php require_once("lib/page-setup.php") ?>
-<?php 
-function renderSignInPage($error = "") { 
-    include('common/header.php');
-    ?>
+<?php
+function renderSignInPage($error = "")
+{
+    include('common/header.php'); ?>
     <div class="signinupdiv">
         <h2 class="maintitleheader">Sign In</h2>
         <hr/>
@@ -36,13 +36,14 @@ function renderSignInPage($error = "") {
         </div>
     </form>
     </div>
-<?php }
+<?php
+}
 ?>
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $em = parse_input("email");
         $p = parse_input("password");
-        if ($em == NULL || $p == NULL) {
+        if ($em == null || $p == null) {
             renderSignInPage('Invalid email address or password');
         } else {
             $s = User::sign_in($em, $p);
@@ -53,8 +54,9 @@ function renderSignInPage($error = "") {
             }
         }
     } else {
-?>
-    <?php //include('common/header.php'); ?>
+        ?>
+    <?php //include('common/header.php');?>
     <?php renderSignInPage() ?>
-<?php } ?>
+<?php
+    } ?>
 <?php include('common/footer.php'); ?>

@@ -1,10 +1,12 @@
 <?php
-    class CourseMembership {
+
+    class CourseMembership
+    {
         public $uid = null;
         public $ch_id = null;
         public $role = null;
 
-        function __construct($uid, $ch_id) 
+        public function __construct($uid, $ch_id)
         {
             global $conn;
 
@@ -14,7 +16,7 @@
 
             // $statement->bind_param("ss", $uid, $course_id);
             // $statement->execute();
-            
+
             // $result = $statement->get_result();
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
@@ -28,7 +30,8 @@
             $this->role = $courseMembership['role'];
         }
 
-        public static function is_user_member($uid, $ch_id) {
+        public static function is_user_member($uid, $ch_id)
+        {
             if (new CourseMembership($uid, $ch_id) != null) {
                 return true;
             } else {
@@ -36,7 +39,7 @@
             }
         }
 
-        public static function get_memberships($uid) 
+        public static function get_memberships($uid)
         {
             global $conn;
 
@@ -46,7 +49,7 @@
 
             // $statement->bind_param("s", $uid);
             // $statement->execute();
-            
+
             // $result = $statement->get_result();
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
@@ -64,10 +67,8 @@
             // }
 
             return $out;
-
-            
         }
-        public static function get_user_courses($uid) 
+        public static function get_user_courses($uid)
         {
             global $conn;
 
@@ -77,7 +78,7 @@
 
             // $statement->bind_param("s", $uid);
             // $statement->execute();
-            
+
             // $result = $statement->get_result();
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
@@ -100,16 +101,16 @@
 
             return $out;
         } // includes instance of Course
-        
+
         public static function create_membership($uid, $ch_id, $role = 1)
         {
             // $uid = $_SESSION['uid'];
-    
+
             global $conn;
-    
+
             $sql = "INSERT INTO `courseMembership` (`uid`, `ch_id`, `role`) VALUES (?, ?, ?)";
             $statement = $conn->prepare($sql);
-    
+
             $statement->bind_param("ssi", $uid, $ch_id, $role);
             $statement->execute();
         }
@@ -136,7 +137,8 @@
         }
     };
 
-    class Course {
+    class Course
+    {
         public $course_code = null;
         public $section_number = null;
         public $instructor_email = null;
@@ -144,9 +146,10 @@
         public $instructor_name = null;
         public $course_description = null;
         public $course_name = null;
-        
 
-        function __construct($course_id=null) {
+
+        public function __construct($course_id=null)
+        {
             if ($course_id != null) {
                 global $conn;
 
@@ -156,14 +159,14 @@
 
                 // $statement->bind_param("s", $course_id);
                 // $statement->execute();
-                
+
                 // $result = $statement->get_result();
                 $numRows = mysqli_num_rows($result);
                 if ($numRows <= 0) {
                     return new Course();
                 }
                 $course = $result->fetch_assoc();
-                
+
                 $this->course_code = $course['course_code'];
                 $this->section_number = $course['section_number'];
                 $this->instructor_email = $course['instructor_email'];
@@ -173,10 +176,11 @@
                 $this->course_name = $course['course_name'];
             }
         }
-        
-        public static function get_courses($course_id_array) {
+
+        public static function get_courses($course_id_array)
+        {
             $courses = array();
-            foreach($course_id_array as $course_id) {
+            foreach ($course_id_array as $course_id) {
                 $c = new Course($course_id);
                 $courses[$course_id] = $c;
             }
@@ -184,7 +188,10 @@
             return $courses;
         }
 
-        public static function create_course() {}
-        public static function update_course() {}
+        public static function create_course()
+        {
+        }
+        public static function update_course()
+        {
+        }
     };
-?>

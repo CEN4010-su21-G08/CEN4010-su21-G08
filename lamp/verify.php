@@ -4,17 +4,18 @@
 ?>
 <?php require_once("lib/page-setup.php") ?>
 <?php include('common/header.php'); ?>
-<?php 
+<?php
     global $user;
-    function showVerificationHelp() {
+    function showVerificationHelp()
+    {
         global $user;
         if (!isset($_GET['code'])) {
             ?>
                 <h2>Account verification</h2>
                 <p>In order to use this site, you'll need to confirm you own the email address you provided.</p>
-                <p>If you do not own the email address <code><?php echo (filter_var($user->email, FILTER_SANITIZE_EMAIL));?></code>, please sign out and create a new account with an email address you do own.</p>
+                <p>If you do not own the email address <code><?php echo(filter_var($user->email, FILTER_SANITIZE_EMAIL)); ?></code>, please sign out and create a new account with an email address you do own.</p>
                 <p>After signing in, Burrow will confirm your email address is attached to your Google account, and then will store only your Google User ID.</p>
-            <?php 
+            <?php
         }
     }
     if (isset($_GET['success'])) {
@@ -30,8 +31,7 @@
         }
     } else {
         if ($user->has_verified()) {
-            echo "You're already verified.";
-            ?> 
+            echo "You're already verified."; ?> 
             <script>window.location.href = 'courses.php';</script>
             <?php
         } else {
