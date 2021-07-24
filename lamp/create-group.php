@@ -14,7 +14,6 @@ if (!isset($_GET['course_id'])) {
 $course_id = $_GET["course_id"];
 $course = new Course($course_id);
 $is_instructor = is_user_instructor($course->course_id);
-$users_in_course = CourseMembership::get_users_in_course($course->course_id);
 if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     <?php
 
@@ -22,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     if (!$is_instructor) { ?>
         <div class="alert alert-danger" style="margin: 20px;">You don't have access to this page or it doesn't exist</div>
     <?php } else {
+        $users_in_course = CourseMembership::get_users_in_course($course->course_id);
         $groups = Channel::get_users_channels_in_course($_SESSION['uid'], $course_id, true); ?>
         <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $course_id, $groups, $is_instructor); ?>
         <div class="channels_main">
