@@ -5,7 +5,34 @@ $center_page = true;
 <?php require_once("lib/page-setup.php") ?>
 <?php require_once("lib/course-handler.php") ?>
 <?php
-if ($_SERVER['REQUEST_METHOD'] == "GET") {
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    header("Content-Type: application/json");
+    $response = array();
+    function sendError($message)
+    {
+        global $response;
+        $response = ["error" => $message];
+        sendResponse();
+    }
+
+    function sendResponse()
+    {
+        global $response;
+        echo (json_encode($response));
+        die();
+    }
+    if (isset($_POST['course_id']) && !empty($_POST['course_id'])) {
+        if (!CourseMembership::is_user_member($user->uid, $_POST['course_id'])) {
+            CourseMembership::create_membership($user->uid, $_POST['course_id']);
+            $response['success'] = true;
+            sendResponse();
+        } else {
+            sendError("You're already a member of that course.");
+        }
+    } else {
+        sendError("Missing ID of course to join.");
+    }
+} else if ($_SERVER['REQUEST_METHOD'] == "GET") {
     if (isset($_GET['action']) && ($_GET['action'] == 'search')) {
         header("Content-Type: application/json");
 
@@ -84,14 +111,14 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 
         ?>
         Courses<br />
-
-        <form autocomplete="off" class="burrow-choose-course-form" method="post" action="">
+        <div id="join-course-error" style="display: none" class="alert alert-danger"></div>
+        <form id="join-course-form" autocomplete="off" class="burrow-choose-course-form" method="post" action="">
             <span style="color: #cc0000;"></span>
             <div class="mb-3 mt-3 autocomplete" style="width: 300px;">
                 <label for="courseCode">Search for courses</label>
                 <input id="courseSearch" type="search" class="mt-1 form-control" name="courseCode" placeholder="Start typing... ex: CEN4010-001" id="courseCode" />
             </div>
-            <input id="courseId" type="hidden" name="courseId" value="" />
+            <input id="course_id" type="hidden" name="course_id" value="" />
             <br />
             <div>
                 Selected course:
@@ -129,10 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
             let searchResults = [];
 
             let $searchInput = $("#courseSearch");
-            let $searchCourseId = $('#courseId');
-            $searchInput.on('input', ((event) => {
-
-            }));
+            let $searchCourseId = $('#course_id');
 
 
             // Based on w3schools's "How TO - Autocomplete"
@@ -274,7 +298,49 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 
 
             autocomplete(document.getElementById("courseSearch"));
+
+
+            let $form = $('#join-course-form');
+            let $alertBox = $("#join-course-error");
+            let $courseIdInput = $("#course_id");
+            function showError(errorMessage = null) {
+                if (errorMessage == null) {
+                    $alertBox.text("");
+                    $alertBox.hide();
+                } else {
+                    $alertBox.text(errorMessage)
+                    $alertBox.show();
+                }
+            }
+            $form.submit(event => {
+                event.preventDefault();
+                if ($courseIdInput.val() == "" || $courseIdInput.val() == " " || $courseIdInput.val() == null || $courseIdInput.val() == undefined) {
+                    showError("Please select a course in the search box below.");
+                } else {
+                    let course_id = $courseIdInput.val();
+                    $.post("courses.php?action=join", {
+                        course_id: course_id,
+                    }, (data, textStatus, jqXHR) => {
+                        if (textStatus != 'success' || data['error'] != undefined) {
+                            if (!data['error']) {
+                                showError("Something went wrong while joining the course. Please try again.");
+                            } else {
+                                showError("Error joining course: " + data['error']);
+                            }
+                        } else {
+                            if (data.success == true) {
+                                showError(); // hide error
+                                window.location.reload();
+                            } else {
+                                showError("Something went wrong while joining the course. Please try again.");
+                            }
+                        }
+                    });
+                }
+            })
         </script>
-<?php include('common/footer.php');
+    <?php include('common/footer.php');
     }
-} ?>
+} else { ?>
+    Invalid Request
+<?php } ?>
