@@ -109,3 +109,65 @@
 
         public static function delete_channel() {}
     }
+
+class GroupMembership
+{
+    public $uid;
+    public $ch_id;
+
+    function __construct($uid, $ch_id) 
+        {
+            global $conn;
+
+            $sql = "SELECT * FROM `groupMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+            $result = $conn->query($sql);
+            // $statement = $conn->prepare($sql);
+
+            // $statement->bind_param("ss", $uid, $course_id);
+            // $statement->execute();
+            
+            // $result = $statement->get_result();
+            $numRows = mysqli_num_rows($result);
+            if ($numRows <= 0) {
+                return null;
+            }
+
+            $groupMembership = $result->fetch_assoc();
+
+            $this->uid = $groupMembership['uid'];
+            $this->ch_id = $groupMembership['ch_id'];
+        }
+    
+    public static function is_user_member($uid, $ch_id) {
+        if (new GroupMembership($uid, $ch_id) != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static function create_membership($uid, $ch_id)
+        {
+            // $uid = $_SESSION['uid'];
+    
+            global $conn;
+
+            if (new GroupMembership($uid, $ch_id) != null)
+            {
+                $groupMembership = new GroupMembership($uid, $ch_id);
+                return $groupMembership;
+            }
+            else
+            {
+            $sql = "INSERT INTO `groupMembership` (`uid`, `ch_id`) VALUES (";
+            $sql .= "'" . $conn->real_escape_string($uid) . "', ";
+            $sql .= "'" . $conn->real_escape_string($ch_id) . "')";
+
+            $conn->query($sql);
+
+            $groupMembership = new GroupMembership($uid, $ch_id);
+
+            return $groupMembership;
+            }
+        }
+}

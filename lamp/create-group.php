@@ -14,9 +14,9 @@ if (!isset($_GET['course_id'])) {
 $course_id = $_GET["course_id"];
 $course = new Course($course_id);
 $is_instructor = is_user_instructor($course->course_id);
+$users_in_course = CourseMembership::get_users_in_course($course->course_id);
 if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     <?php
-    $users_in_course = CourseMembership::get_users_in_course($course->course_id);
 
     include('./common/header.php');
     if (!$is_instructor) { ?>
@@ -29,8 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
         <?php 
             function render_create_group_page($error=null) { ?>
                 <?php
-                global $course, $course_id;
-                $users_in_course = CourseMembership::get_users_in_course($course->course_id);
+                global $course, $course_id, $users_in_course;
                 if ($error) { ?>
                 <br />
                 <div class="alert alert-danger" style="margin-right: 15px;"><?php echo $error; ?></div>
@@ -44,7 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                         <?php
                         foreach ($users_in_course as $user)
                         { ?>
-                           <!-- <li><input type="checkbox" required name = "<?php echo(htmlspecialchars($user->uid)) ?>" value = 1/><?php echo($user->first_name); echo(" "); echo($user->last_name); ?> </li> -->
+                           <li><input type="checkbox" id ="<?php echo(htmlspecialchars($user->uid)); ?>" name ="<?php echo(htmlspecialchars($user->uid)); ?>" /> 
+                           <label for="<?php echo(htmlspecialchars($user->uid)); ?>"> <?php echo($user->first_name); echo(" "); echo($user->last_name); ?></label></li>
                         <?php } ?>
                     </ul>
                 </div>
@@ -72,5 +72,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
             if (!validate_input($_POST, "group_name")) return render_create_group_page("Please provide a group name");
 
             $group_name = parse_input('group_name', true);
-            Channel::create_channel($course->course_id, $group_name, 2);
+            $group = Channel::create_channel($course->course_id, $group_name, 2);
+            GroupMembership::create_membership($_SESSION['uid'], $group->ch_id);
+            foreach ($users_in_course as $user)
+            {
+                if (isset($_POST[$user->uid]))
+                {
+                    GroupMembership::create_membership($user->uid, $group->ch_id);
+                }
+            }
+            header("Location: create-group.php?course_id=" . htmlspecialchars($course->course_id));
         }
