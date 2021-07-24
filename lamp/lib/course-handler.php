@@ -29,7 +29,7 @@
         }
 
         public static function is_user_member($uid, $ch_id) {
-            if (new CourseMembership($uid, $ch_id) != null) {
+            if ((new CourseMembership($uid, $ch_id))->uid != null) {
                 return true;
             } else {
                 return false;
