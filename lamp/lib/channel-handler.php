@@ -1,15 +1,17 @@
 <?php
-    class Channel {
+
+    class Channel
+    {
         public $ch_id = null;
         public $name = null;
         public $type = null;
         public $course_id = null;
-        
-        function __construct($ch_id, $type = null, $name = null, $course_id = null)
+
+        public function __construct($ch_id, $type = null, $name = null, $course_id = null)
         {
             if ($type == null) {
                 global $conn;
-                
+
                 $sql = "SELECT * FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
                 $result = $conn->query($sql);
 
@@ -62,9 +64,7 @@
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
                 $out = array();
-            }
-            else
-            {
+            } else {
                 $out = array();
                 while ($row = $result->fetch_assoc()) {
                     $out[] = new Channel($row['ch_id'], $row['type'], $row['name'], $row['course_id']);
@@ -86,17 +86,21 @@
             course_id: required
             */
 
-            if (!isset($course_id))
+            if (!isset($course_id)) {
                 throwError(500, "Error creating channel: course does not exist");
-            
+            }
+
             $ch_id = generateRandomString();
 
             $sql = "INSERT INTO `channels` (`ch_id`,";
-            if (isset($name)) $sql .= "`name`,";
+            if (isset($name)) {
+                $sql .= "`name`,";
+            }
             $sql .= "`type`,`course_id`) VALUES (";
             $sql .= "'" . $conn->real_escape_string($ch_id) . "'" . ", ";
-            if (isset($name))
+            if (isset($name)) {
                 $sql .= "'" . $conn->real_escape_string($name) . "'" . ", ";
+            }
             $sql .= "'" . $conn->real_escape_string($type) . "'" . ", ";
             $sql .= "'" . $conn->real_escape_string($course_id) . "'" . ") ";
 
@@ -107,7 +111,9 @@
             return $channel;
         }
 
-        public static function delete_channel() {}
+        public static function delete_channel()
+        {
+        }
     }
 
 class GroupMembership
@@ -115,28 +121,29 @@ class GroupMembership
     public $uid = null;
     public $ch_id = null;
 
-    function __construct($uid, $ch_id) 
-        {
-            global $conn;
+    public function __construct($uid, $ch_id)
+    {
+        global $conn;
 
-            $sql = "SELECT * FROM `groupMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
-            $result = $conn->query($sql);
-            // $statement = $conn->prepare($sql);
+        $sql = "SELECT * FROM `groupMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+        $result = $conn->query($sql);
+        // $statement = $conn->prepare($sql);
 
-            // $statement->bind_param("ss", $uid, $course_id);
-            // $statement->execute();
-            
-            // $result = $statement->get_result();
-            $numRows = mysqli_num_rows($result);
-            if ($numRows > 0) {
-                $groupMembership = $result->fetch_assoc();
+        // $statement->bind_param("ss", $uid, $course_id);
+        // $statement->execute();
 
-                $this->uid = $groupMembership['uid'];
-                $this->ch_id = $groupMembership['ch_id'];
-            }
+        // $result = $statement->get_result();
+        $numRows = mysqli_num_rows($result);
+        if ($numRows > 0) {
+            $groupMembership = $result->fetch_assoc();
+
+            $this->uid = $groupMembership['uid'];
+            $this->ch_id = $groupMembership['ch_id'];
         }
-    
-    public static function is_user_member($uid, $ch_id) {
+    }
+
+    public static function is_user_member($uid, $ch_id)
+    {
         if (new GroupMembership($uid, $ch_id) != null) {
             return true;
         } else {
@@ -145,18 +152,15 @@ class GroupMembership
     }
 
     public static function create_membership($uid, $ch_id)
-        {
-            // $uid = $_SESSION['uid'];
-    
-            global $conn;
+    {
+        // $uid = $_SESSION['uid'];
 
-            if ((new GroupMembership($uid, $ch_id))->uid != null)
-            {
-                $groupMembership = new GroupMembership($uid, $ch_id);
-                return $groupMembership;
-            }
-            else
-            {
+        global $conn;
+
+        if ((new GroupMembership($uid, $ch_id))->uid != null) {
+            $groupMembership = new GroupMembership($uid, $ch_id);
+            return $groupMembership;
+        } else {
             $sql = "INSERT INTO `groupMembership` (`uid`, `ch_id`) VALUES (";
             $sql .= "'" . $conn->real_escape_string($uid) . "', ";
             $sql .= "'" . $conn->real_escape_string($ch_id) . "')";
@@ -166,6 +170,6 @@ class GroupMembership
             $groupMembership = new GroupMembership($uid, $ch_id);
 
             return $groupMembership;
-            }
         }
+    }
 }
