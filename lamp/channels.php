@@ -42,61 +42,89 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     ?>
                 </h2>
                 <?php
-                    if ($is_instructor)
-                    { ?>
-                        <h2>INSTRUCTOR VIEW</h2>
-                    <?php } ?>
+                if ($is_instructor) { ?>
+                    <h2>INSTRUCTOR VIEW</h2>
+                <?php } ?>
                 <div class="older">
                     <button id="older-btn" class="btn btn-outline-secondary" onclick="getOlderMessages();">Load earlier messages</button>
                 </div>
                 <div class="messages"></div>
             </div>
             <?php if (!$announcement || ($announcement && $is_instructor)) { ?>
-            <form method="post" id="send_message_form" action="<?php echo (htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
-                <div class="form-group">
-                    <input class="form-control" name="message" type="text" placeholder="<?= $announcement ? "Announcement" : "Message" ?>" />
-                    <?php if ($is_primary_course_chat && $is_instructor && !$announcement) { ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="send_as_announcement" id="send_as_announcement">
-                            <label class="form-check-label" for="send_as_announcement">
-                                Send as announcement
-                            </label>
+                <form method="post" id="send_message_form" action="<?php echo (htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
+                    <div class="form-group">
+                        <div id="message_send_validation_group" class="has-validation">
+                            <input class="form-control" name="message" maxlength="165" type="text" placeholder="<?= $announcement ? "Announcement" : "Message" ?>" />
+                            <div class="invalid-feedback">
+                                Could not send message.
+                            </div>
                         </div>
-                    <?php } ?>
-                    <button style="margin-top: 5px;" class="btn btn-primary" type="submit">Send <?= $announcement ? "Announcement" : "Message" ?></button>
-                </div>
-            </form>
+                        <?php if ($is_primary_course_chat && $is_instructor && !$announcement) { ?>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" name="send_as_announcement" id="send_as_announcement">
+                                <label class="form-check-label" for="send_as_announcement">
+                                    Send as announcement
+                                </label>
+                            </div>
+                        <?php } ?>
+
+                        <button style="margin-top: 5px;" class="btn btn-primary" type="submit">Send <?= $announcement ? "Announcement" : "Message" ?></button>
+                    </div>
+                </form>
             <?php } ?>
 
             <script>
                 <?php if (!$announcement || ($announcement && $is_instructor)) { ?>
-                $send_input = $("input[name=message]");
-                $send_button = $("button[type=submit]");
-                <?php if (!$announcement && $is_instructor) { ?>
-                    $send_as_announcement = $("input[type=checkbox]");
-                <?php } ?>
-                $('#send_message_form').submit(event => {
-                    event.preventDefault();
-                    let data = $('#send_message_form').serialize();
-                    console.log(data);
-                    console.log(event.target);
-
-                    $send_input.addClass("disabled");
-                    $send_input.attr("disabled", "disabled");
-                    $send_button.addClass("disabled");
-                    $send_button.attr("disabled", "disabled");
-                    $send_button.text("Sending...");
+                    $send_input = $("input[name=message]");
+                    $send_button = $("button[type=submit]");
                     <?php if (!$announcement && $is_instructor) { ?>
-                        $send_as_announcement.addClass("disabled");
-                        $send_as_announcement.attr("disabled", "disabled");
-                        $is_announcement = $send_as_announcement.is(":checked");
+                        $send_as_announcement = $("input[type=checkbox]");
                     <?php } ?>
-                    
+                    $('#send_message_form').submit(event => {
+                        event.preventDefault();
+                        let data = $('#send_message_form').serialize();
+                        console.log(data);
+                        console.log(event.target);
 
-                    $('#send_message_form').children("input[name=message]").addClass("disabled");
-                    $.post("messages.php?<?php if ($is_primary_course_chat && !$announcement && $is_instructor) { ?>" + ($is_announcement ? "announcements&" : "") + "<?php } ?><?= ($announcement && $is_instructor) ? "announcements&" : ""?>ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>"), data, () => {
-                        $send_input.val("");
-                        getNewMessages(() => {
+                        $send_input.addClass("disabled");
+                        $send_input.attr("disabled", "disabled");
+                        $send_button.addClass("disabled");
+                        $send_button.attr("disabled", "disabled");
+                        $send_button.text("Sending...");
+                        <?php if (!$announcement && $is_instructor) { ?>
+                            $send_as_announcement.addClass("disabled");
+                            $send_as_announcement.attr("disabled", "disabled");
+                            $is_announcement = $send_as_announcement.is(":checked");
+                        <?php } ?>
+
+
+                        $('#send_message_form').children("input[name=message]").addClass("disabled");
+                        $.post("messages.php?<?php if ($is_primary_course_chat && !$announcement && $is_instructor) { ?>" + ($is_announcement ? "announcements&" : "") + "<?php } ?><?= ($announcement && $is_instructor) ? "announcements&" : "" ?>ch_id=" + encodeURIComponent("<?php echo (htmlspecialchars($_GET['ch_id'])); ?>"), data, () => {
+                            $send_input.val("");
+                            getNewMessages(() => {
+                                $send_input.removeClass("disabled");
+                                $send_input.attr("disabled", null);
+                                $send_button.removeClass("disabled");
+                                $send_button.attr("disabled", null);
+                                $send_button.text("Send Message");
+                                <?php if (!$announcement && $is_instructor) { ?>
+                                    $send_as_announcement.prop("checked", false);
+                                    $send_as_announcement.removeClass("disabled");
+                                    $send_as_announcement.attr("disabled", null);
+                                <?php } ?>
+                            });
+
+                        }).fail((xhr, status, error) => {
+                            console.log(xhr, status, error)
+                            $send_input.addClass("is-invalid");
+                            let errorText = "Could not send your message";
+                            if (xhr.responseJSON && xhr.responseJSON['error']) {
+                                errorText = "Could not send your message: " + xhr.responseJSON['error'];
+                                if (xhr.responseJSON['error'] == 'Message too long') {
+                                    errorText += " (max of 165 characters)";
+                                }
+                            }
+                            $("#message_send_validation_group .invalid-feedback").text(errorText);
                             $send_input.removeClass("disabled");
                             $send_input.attr("disabled", null);
                             $send_button.removeClass("disabled");
@@ -107,10 +135,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                                 $send_as_announcement.removeClass("disabled");
                                 $send_as_announcement.attr("disabled", null);
                             <?php } ?>
-                        });
-
-                    })
-                });
+                        })
+                    });
 
                 <?php } ?>
 

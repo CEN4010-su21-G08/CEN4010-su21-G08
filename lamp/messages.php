@@ -11,8 +11,18 @@ require_once('lib/message-handler.php');
     if ($_SERVER['REQUEST_METHOD'] == "POST") {
         global $user;
         $message = parse_input('message', true);
-        $res = Message::send($channel_id, $user->uid, $message, $announcement);
         header("Content-Type: application/json");
+        if (!is_string($message)) {
+            http_response_code(400);
+            echo(json_encode(['error' => "Invalid message content."]));
+            die();
+        }
+        if (strlen($message) > 165) {
+            http_response_code(400);
+            echo(json_encode(['error' => "Message too long"]));
+            die();
+        }
+        $res = Message::send($channel_id, $user->uid, $message, $announcement);
         echo (json_encode($res));
     } else if ($_SERVER['REQUEST_METHOD'] == "GET") {
         if (isset($_GET['start_before']) && !empty($_GET['start_before'])) {
