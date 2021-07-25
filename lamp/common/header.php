@@ -44,5 +44,5 @@ global $center_page;
   </header>
   <main>
     <?php if (!isset($include_sidebar)) {
-      ?> <div class="main-content<?php if (isset($center_page)) { ?> main-content-center<?php }?>"><?php
-    } ?>
+    ?> <div class="main-content<?php if (isset($center_page)) { ?> main-content-center<?php } ?>"><?php
+} ?>

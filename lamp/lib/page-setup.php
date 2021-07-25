@@ -1,4 +1,5 @@
 <?php
+
     define("app_page", true);
 
     $is_logged_in = false;
@@ -15,14 +16,12 @@
     }
 
     if (isset($auth_needed) && ($auth_needed == false)) {
-        
     } else {
         if (!$is_logged_in) {
             header("Location: signin.php?r");
             die();
         } else {
             if (isset($verify_page) && $verify_page == true) {
-
             } else {
                 // redirect to verify page
                 if ($user == null || !$user->has_verified()) {
@@ -34,6 +33,3 @@
 
     $sidebar_shown = false;
     require_once('common/sidebar.php');
-
-    
-
