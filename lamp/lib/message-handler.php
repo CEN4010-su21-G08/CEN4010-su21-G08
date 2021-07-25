@@ -1,4 +1,5 @@
 <?php
+
 error_reporting(-1);
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
@@ -15,7 +16,7 @@ class Message
     public $display_name = null;
     public $initials = null;
 
-    function  __construct($m_id = null, $uid = null, $message = null, $ch_id = null, $flags = null, $send_date = null, $edit_date = null, $display_name = null, $initials = null)
+    public function __construct($m_id = null, $uid = null, $message = null, $ch_id = null, $flags = null, $send_date = null, $edit_date = null, $display_name = null, $initials = null)
     {
         $this->m_id = $m_id;
         $this->uid = $uid;
@@ -68,7 +69,7 @@ class Message
         } else {
             $statement->bind_param("ssss", $mid, $uid, $message, $channel_id);
         }
-        
+
         $statement->execute();
 
         return ['success' => 'true'];
@@ -168,7 +169,7 @@ class Message
     // Modifies the message object before doing anything with it
     private static function message_parser_helper($row)
     {
-        if ($row['display_name'] == NULL || $row['display_name'] == NULL || $row['display_name'] == NULL) {
+        if ($row['display_name'] == null || $row['display_name'] == null || $row['display_name'] == null) {
             $row['display_name'] = "Deleted User";
             $row["initials"] = "NA";
         } else {

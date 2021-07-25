@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
         <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $course_id, $groups, $is_instructor); ?>
         <div class="channels_main">
         <h2>Create a Group</h2>
-        <?php 
+        <?php
             function render_create_group_page($error=null) { ?>
                 <?php
                 global $course, $course_id, $users_in_course;
@@ -36,13 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 <?php } ?>
                 <br />
                 <form method="post" action="create-group.php?course_id=<?= htmlspecialchars($course_id) ?>">
-                <input required name="group_name" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['group_name'])); ?>" <?php } ?>placeholder="group name" /><br />
+                <input required name="group_name" <?php if ($error) { ?>value="<?php echo(htmlspecialchars($_POST['group_name'])); ?>" <?php } ?>placeholder="group name" /><br />
                 <div id="list1" class="dropdown-check-list" tabindex="100">
                     <span class="anchor">Users</span>
                     <ul class="items">
                         <?php
-                        foreach ($users_in_course as $user)
-                        { ?>
+                        foreach ($users_in_course as $user) { ?>
                            <li><input type="checkbox" id ="<?php echo(htmlspecialchars($user->uid)); ?>" name ="<?php echo(htmlspecialchars($user->uid)); ?>" /> 
                            <label for="<?php echo(htmlspecialchars($user->uid)); ?>"> <?php echo($user->first_name); echo(" "); echo($user->last_name); ?></label></li>
                         <?php } ?>
@@ -53,7 +52,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 <button type="submit">Submit</button>
                 </form>
         <?php } ?>
-    <?php } ?>
+    <?php
+    } ?>
             <?php render_create_group_page(); ?>
         </div>
         <script>
@@ -68,18 +68,18 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
         </div>
         <?php include('common/footer.php'); ?>
     <?php }
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {  
-            if (!validate_input($_POST, "group_name")) return render_create_group_page("Please provide a group name");
-
-            $group_name = parse_input('group_name', true);
-            $group = Channel::create_channel($course->course_id, $group_name, 2);
-            GroupMembership::create_membership($_SESSION['uid'], $group->ch_id);
-            foreach ($users_in_course as $user)
-            {
-                if (isset($_POST[$user->uid]))
-                {
-                    GroupMembership::create_membership($user->uid, $group->ch_id);
-                }
-            }
-            header("Location: create-group.php?course_id=" . htmlspecialchars($course->course_id));
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if (!validate_input($_POST, "group_name")) {
+            return render_create_group_page("Please provide a group name");
         }
+
+        $group_name = parse_input('group_name', true);
+        $group = Channel::create_channel($course->course_id, $group_name, 2);
+        GroupMembership::create_membership($_SESSION['uid'], $group->ch_id);
+        foreach ($users_in_course as $user) {
+            if (isset($_POST[$user->uid])) {
+                GroupMembership::create_membership($user->uid, $group->ch_id);
+            }
+        }
+        header("Location: create-group.php?course_id=" . htmlspecialchars($course->course_id));
+    }

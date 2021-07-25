@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     function sendResponse()
     {
         global $response;
-        echo (json_encode($response));
+        echo(json_encode($response));
         die();
     }
     if (isset($_POST['course_id']) && !empty($_POST['course_id'])) {
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     } else {
         sendError("Missing ID of course to join.");
     }
-} else if ($_SERVER['REQUEST_METHOD'] == "GET") {
+} elseif ($_SERVER['REQUEST_METHOD'] == "GET") {
     if (isset($_GET['action']) && ($_GET['action'] == 'search')) {
         header("Content-Type: application/json");
 
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         function sendResponse()
         {
             global $response;
-            echo (json_encode($response));
+            echo(json_encode($response));
             die();
         }
 
@@ -88,28 +88,28 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         sendResponse();
     } else {
-?>
+        ?>
         <?php include('common/header.php'); ?>
         <link rel="stylesheet" href="static/autocomplete.css" />
         <?php
         function course_list_show_course($course, $stu_only = null)
         {
             if ($stu_only === null || ($stu_only === false && $course->is_instructor()) || ($stu_only == true && !$course->is_instructor())) { ?>
-                <a href="channels.php?ch_id=<?php echo (urlencode(htmlspecialchars($course->course_id))); ?>" class="list-group-item list-group-item-action"><?php echo (htmlspecialchars($course->course_code)); ?>-<?php echo (htmlspecialchars($course->section_number)); ?></a>
+                <a href="channels.php?ch_id=<?php echo(urlencode(htmlspecialchars($course->course_id))); ?>" class="list-group-item list-group-item-action"><?php echo(htmlspecialchars($course->course_code)); ?>-<?php echo(htmlspecialchars($course->section_number)); ?></a>
         <?php
             }
-        }
-        ?>
+        } ?>
         <?php
         $courses = CourseMembership::get_user_courses($_SESSION['uid']);
         $course_types = ['instructor' => 0, 'student' => 0];
         foreach ($courses as $course) {
-            if ($course->is_instructor()) $course_types['instructor']++;
-            else $course_types['student']++;
+            if ($course->is_instructor()) {
+                $course_types['instructor']++;
+            } else {
+                $course_types['student']++;
+            }
         }
-        // $courses[0]->role = 0;
-
-        ?>
+        // $courses[0]->role = 0;?>
         Courses<br />
         <div id="join-course-error" style="display: none" class="alert alert-danger"></div>
         <form id="join-course-form" autocomplete="off" class="burrow-choose-course-form" method="post" action="">
@@ -135,8 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 <h3 class="h6">Joined as a student:</h3>
                 <div class="list-group">
                     <?php foreach ($courses as $course) {
-                        course_list_show_course($course, true);
-                    } ?>
+            course_list_show_course($course, true);
+        } ?>
                 </div>
             </div>
         <?php }
@@ -145,8 +145,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 <h3 class="h6">Joined as an instructor:</h3>
                 <div class="list-group">
                     <?php foreach ($courses as $course) {
-                        course_list_show_course($course, false);
-                    } ?>
+            course_list_show_course($course, false);
+        } ?>
                 </div>
             </div>
         <?php } ?>

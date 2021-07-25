@@ -4,10 +4,10 @@
     $center_page = true;
 ?>
 <?php require_once("lib/page-setup.php"); ?>
-<?php 
-    function render_signup_page($error=null) {
-        include('common/header.php');
-        ?>
+<?php
+    function render_signup_page($error=null)
+    {
+        include('common/header.php'); ?>
         <div class="signinupdiv">
             <h2 class="maintitleheader">Sign Up</h1>
             <hr/>
@@ -24,15 +24,15 @@
             <form class="burrow-form sign-up-form" method="post" action="<?php echo(htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
                 <div class="form-group">
                     <label class="form-label" for="firstname">First Name</label>
-                    <input required id="firstname" name="first_name" class="form-control" placeholder="First Name" type="text"<?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['first_name'])); ?>" <?php } ?>placeholder="first name" />
+                    <input required id="firstname" name="first_name" class="form-control" placeholder="First Name" type="text"<?php if ($error) { ?>value="<?php echo(htmlspecialchars($_POST['first_name'])); ?>" <?php } ?>placeholder="first name" />
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="lastname">Last Name</label>
-                    <input required id="lastname" name="last_name" placeholder="Last Name" class="form-control" type="text"<?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['last_name'])); ?>" <?php } ?> />
+                    <input required id="lastname" name="last_name" placeholder="Last Name" class="form-control" type="text"<?php if ($error) { ?>value="<?php echo(htmlspecialchars($_POST['last_name'])); ?>" <?php } ?> />
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="email">Email</label>
-                    <input required id="email" type="email" name="email" placeholder="example@fau.edu" class="form-control"<?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['email'])); ?>" <?php } ?> />
+                    <input required id="email" type="email" name="email" placeholder="example@fau.edu" class="form-control"<?php if ($error) { ?>value="<?php echo(htmlspecialchars($_POST['email'])); ?>" <?php } ?> />
                     <small id="emailHelp" class="form-text text-muted">Please use your FAU email to sign up</small>
                 </div>
                 <div class="form-group">
@@ -49,13 +49,12 @@
                     <select required id="namesel" name="display_name" class="form-select">
                         
                     <?php $selected_dn = "0";
-                        if ($error) { 
-                            $selected_dn = $_POST['display_name'] ? htmlspecialchars($_POST['display_name']) : '0';
-                        }
-                    ?>
+        if ($error) {
+            $selected_dn = $_POST['display_name'] ? htmlspecialchars($_POST['display_name']) : '0';
+        } ?>
                         <option selected>Please choose a display name option</option>
-                        <option <?= $selected_dn == "1" ? "selected ": ""; ?>value="1">First Last</option>
-                        <option <?= $selected_dn == "2" ? "selected ": ""; ?>value="2">Last First</option>
+                        <option <?= $selected_dn == "1" ? "selected " : ""; ?>value="1">First Last</option>
+                        <option <?= $selected_dn == "2" ? "selected " : ""; ?>value="2">Last First</option>
                     </select>
                 </div>
                 <div class="d-grid">
@@ -63,15 +62,28 @@
                 </div>
             </form>
         </div>
-<?php } ?>
+<?php
+    } ?>
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (!validate_input($_POST, "first_name")) return render_signup_page("Please provide a first name");
-        if (!validate_input($_POST, "last_name")) return render_signup_page("Please provide a last name");
-        if (!validate_input($_POST, "email")) return render_signup_page("Please provide a email address");
-        if (!validate_input($_POST, "password")) return render_signup_page("Please provide a password");
-        if (!validate_input($_POST, "verify_password")) return render_signup_page("Please provide a password");
-        if (!validate_input($_POST, "display_name")) return render_signup_page("Please provide a valid display name");
+        if (!validate_input($_POST, "first_name")) {
+            return render_signup_page("Please provide a first name");
+        }
+        if (!validate_input($_POST, "last_name")) {
+            return render_signup_page("Please provide a last name");
+        }
+        if (!validate_input($_POST, "email")) {
+            return render_signup_page("Please provide a email address");
+        }
+        if (!validate_input($_POST, "password")) {
+            return render_signup_page("Please provide a password");
+        }
+        if (!validate_input($_POST, "verify_password")) {
+            return render_signup_page("Please provide a password");
+        }
+        if (!validate_input($_POST, "display_name")) {
+            return render_signup_page("Please provide a valid display name");
+        }
 
         $first_name = parse_input('first_name', true);
         $last_name = parse_input('last_name', true);
@@ -89,8 +101,9 @@
         }
         // create_user_account();
     } else {
-?>
+        ?>
     <?php render_signup_page(); ?>
     
-<?php } ?>
+<?php
+    } ?>
 <?php include('common/footer.php'); ?>
