@@ -31,7 +31,7 @@
         }
     } else {
         if ($user->has_verified()) {
-            echo "You're already verified."; ?> 
+            echo "You're already verified."; ?>
             <script>window.location.href = 'courses.php';</script>
             <?php
         } else {

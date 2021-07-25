@@ -14,6 +14,6 @@
         <h1>You have been signed out</h2>
         <br>
         <br>
-        <a href="index.php">Click here to return to home page</a> 
+        <a href="index.php">Click here to return to home page</a>
     </div>
 <?php include('common/footer.php'); ?>
