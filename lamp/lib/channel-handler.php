@@ -112,8 +112,8 @@
 
 class GroupMembership
 {
-    public $uid;
-    public $ch_id;
+    public $uid = null;
+    public $ch_id = null;
 
     function __construct($uid, $ch_id) 
         {
@@ -128,14 +128,12 @@ class GroupMembership
             
             // $result = $statement->get_result();
             $numRows = mysqli_num_rows($result);
-            if ($numRows <= 0) {
-                return null;
+            if ($numRows > 0) {
+                $groupMembership = $result->fetch_assoc();
+
+                $this->uid = $groupMembership['uid'];
+                $this->ch_id = $groupMembership['ch_id'];
             }
-
-            $groupMembership = $result->fetch_assoc();
-
-            $this->uid = $groupMembership['uid'];
-            $this->ch_id = $groupMembership['ch_id'];
         }
     
     public static function is_user_member($uid, $ch_id) {
@@ -152,7 +150,7 @@ class GroupMembership
     
             global $conn;
 
-            if (new GroupMembership($uid, $ch_id) != null)
+            if ((new GroupMembership($uid, $ch_id))->uid != null)
             {
                 $groupMembership = new GroupMembership($uid, $ch_id);
                 return $groupMembership;
