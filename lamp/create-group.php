@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     <ul class="items">
                         <?php
                         foreach ($users_in_course as $user) { ?>
-                           <li><input type="checkbox" id ="<?php echo(htmlspecialchars($user->uid)); ?>" name ="<?php echo(htmlspecialchars($user->uid)); ?>" /> 
+                           <li><input type="checkbox" id ="<?php echo(htmlspecialchars($user->uid)); ?>" name ="<?php echo(htmlspecialchars($user->uid)); ?>" />
                            <label for="<?php echo(htmlspecialchars($user->uid)); ?>"> <?php echo($user->first_name); echo(" "); echo($user->last_name); ?></label></li>
                         <?php } ?>
                     </ul>
