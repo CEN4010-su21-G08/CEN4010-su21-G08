@@ -69,7 +69,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
         <?php include('common/footer.php'); ?>
     <?php }
     if ($_SERVER["REQUEST_METHOD"] == "POST") {  
+        if (!$is_instructor) { 
+            include('./common/header.php'); ?>
+            <div class="alert alert-danger" style="margin: 20px;">You don't have access to this page or it doesn't exist</div>
+        <?php 
+        } else {
             if (!validate_input($_POST, "group_name")) return render_create_group_page("Please provide a group name");
+
+            $users_in_course = CourseMembership::get_users_in_course($course->course_id);
 
             $group_name = parse_input('group_name', true);
             $group = Channel::create_channel($course->course_id, $group_name, 2);
@@ -83,3 +90,4 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
             }
             header("Location: create-group.php?course_id=" . htmlspecialchars($course->course_id));
         }
+    }
