@@ -1,94 +1,182 @@
 <?php
-    // foreach (glob("vendor/*.php") as $filename) {
-    //     require_once $filename;}
+error_reporting(-1);
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    // use Ramsey\Uuid\UuidInterface;
-    // use Ramsey\Uuid\Uuid;
-    error_reporting(-1);
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+class Message
+{
+    public $m_id = null;
+    public $uid = null;
+    public $message = null;
+    public $ch_id = null;
+    public $flags = null;
+    public $send_date = null;
+    public $edit_date = null;
 
-    function send_message()
+    public $display_name = null;
+    public $initials = null;
+
+    function  __construct($m_id = null, $uid = null, $message = null, $ch_id = null, $flags = null, $send_date = null, $edit_date = null, $display_name = null, $initials = null)
     {
-        global $channel_id;
+        $this->m_id = $m_id;
+        $this->uid = $uid;
+        $this->message = $message;
+        $this->ch_id = $ch_id;
+        $this->flags = $flags;
+        $this->send_date = $send_date;
+        $this->edit_date = $edit_date;
+
+
+        $this->display_name = $display_name;
+        $this->initials = $initials;
+    }
+
+    public static function send($channel_id, $uid, $message, $announcement = false)
+    {
         if (!isset($channel_id)) {
-            throwError(400, "Invalid Channel provided");
+            return ['error' => "Invalid channel ID provided."];
         }
+
+        if (!does_user_have_access($uid, $channel_id)) {
+            return ['error' => "Forbidden"];
+        }
+
+        if ($announcement && !is_user_instructor($channel_id)) {
+            return ['error' => "Forbidden"];
+        }
+
         global $conn;
 
-        $sql = "INSERT INTO `messages` (`m_id`, `uid`, `message`, `ch_id`) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO `messages` (`m_id`, `uid`, `message`, `ch_id`";
+        if ($announcement) {
+            $sql .= ", `flags`";
+        }
+        $sql .= ") VALUES (?, ?, ?, ?";
+        if ($announcement) {
+            $sql .= ", ?";
+        }
+        $sql .= ")";
         $statement = $conn->prepare($sql);
 
         $message = parse_input('message', true);
-
-        // echo '<br />';
-        // echo $message;
-
-        // $_mid = Uuid::uuid4();
-        // $mid = $_mid->toString();
         $mid = generateRandomString();
 
         $uid = $_SESSION['uid'];
-        
 
-        $statement->bind_param("ssss", $mid, $uid, $message, $channel_id);
+        $flags = intval(1);
+        if ($announcement) {
+            $statement->bind_param("ssssi", $mid, $uid, $message, $channel_id, $flags);
+        } else {
+            $statement->bind_param("ssss", $mid, $uid, $message, $channel_id);
+        }
+        
         $statement->execute();
+
+        return ['success' => 'true'];
     }
 
-    function get_messages($start_after = NULL, $json = false) {
-        global $channel_id;
+    public static function get($message_id)
+    {
         global $conn;
-        
-        // $sql = "SELECT * FROM `messages` WHERE `ch_id` = ?";
-        $sql = "SELECT `messages`.*, `users`.`first_name`, `users`.`last_name`, `users`.`display_name` FROM `messages` LEFT JOIN `users` ON `messages`.`uid` = `users`.`uid` WHERE `messages`.`ch_id` = '" . $conn->real_escape_string($channel_id) . "'";
-        if (isset($start_after) && $start_after != NULL) {
-            $sql .= " AND `messages`.`send_date` >= '" . $conn->real_escape_string($start_after) . "'";
-        }
-        $sql .= " ORDER BY `messages`.`send_date` DESC LIMIT 5;";
-        // error_log($sql);
-        // error_log($start_after);
-        // $statement = $conn->prepare($sql);
-        // if (isset($start_after) && $start_after != NULL) {
-        //     $statement->bind_param("ss", $channel_id, $start_after);
-        // } else {
-        //     $statement->bind_param("s", $channel_id);
-        // }
+        global $user;
+        $sql = "SELECT `messages`.*, `users`.`first_name`, `users`.`last_name`, `users`.`display_name` FROM `messages` LEFT JOIN `users` ON `messages`.`uid` = `users`.`uid` WHERE `messages`.`m_id` = '" . $conn->real_escape_string($message_id) .  "'";
 
-        
         $result = $conn->query($sql);
 
-
-        // $statement->execute();
-        // $result = $statement->get_result();
-        // $rows = $result->fetch_all(MYSQLI_ASSOC);
-        
-        $new_rows = [];
-        // foreach($rows as $row) {
         while ($row = $result->fetch_assoc()) {
-            if ($row['display_name'] == NULL || $row['display_name'] == NULL || $row['display_name'] == NULL) {
-                $row['display_name'] = "Deleted User";
-                $row["initials"] = "NA";
-            } else {
-                $row['display_name'] = get_display_name($row['first_name'], $row['last_name'], $row['display_name']);
-                $row['initials'] = substr($row['first_name'], 0, 1) . substr($row['last_name'], 0, 1);
+            $r = self::message_parser_helper($row);
+            if (!does_user_have_access($user->uid, $r['ch_id'])) {
+                return ['error' => "Forbidden"];
             }
-            unset($row['first_name']);
-            unset($row['last_name']);
-            $new_rows[] = $row;
+            return new Message($r['m_id'], $r['uid'], $r['message'], $r['ch_id'], $r['flags'], $r['send_date'], $r['edit_date'], $r['display_name'], $r['initials']);
         }
 
-        if ($json) {
-            return json_encode($new_rows);
-        } else {
-            return $new_rows;
-        }
-        // foreach($rows as $row) {
-        //     var_dump($row);
-            
-        //     echo '<br />';
-        //     echo $row["m_id"];
-        //     echo '<br />';
-        // }
-
-        // // $statement->bind_result();
-        // echo mysqli_num_rows($result);
+        return new Message();
     }
+
+    public static function get_many($message_ids)
+    {
+        $messages = [];
+        foreach ($message_ids as $message_id) {
+            $messages[] = self::get($message_id);
+        }
+
+        return $messages;
+    }
+
+    public static function get_after($channel_id, $after_m_id = null, $announcement = false)
+    {
+        global $user;
+        if (!does_user_have_access($user->uid, $channel_id)) {
+            return ['error' => "Forbidden"];
+        }
+        global $conn;
+        $sql = "SELECT `messages`.*, `users`.`first_name`, `users`.`last_name`, `users`.`display_name` FROM `messages` LEFT JOIN `users` ON `messages`.`uid` = `users`.`uid` WHERE `messages`.`ch_id` = '" . $conn->real_escape_string($channel_id) . "'";
+        if ($announcement) {
+            $sql .= " AND (`messages`.`flags` & (1 << 0)) = 1";
+        }
+        if (isset($after_m_id) && $after_m_id != null) {
+            $sql .= " AND `messages`.`send_date` >= ( SELECT `send_date` FROM `messages` WHERE `m_id` = '" . $conn->real_escape_string($after_m_id) . "' LIMIT 1 )";
+            $sql .= " ORDER BY `messages`.`send_date` ASC LIMIT 10;";
+        } else {
+            $sql .= " ORDER BY `messages`.`send_date` DESC LIMIT 10;";
+        }
+
+        $result = $conn->query($sql);
+
+        $messages = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $r = self::message_parser_helper($row);
+            if ($r['m_id'] != $after_m_id) { // filter out current message
+                $m = new Message($r['m_id'], $r['uid'], $r['message'], $r['ch_id'], $r['flags'], $r['send_date'], $r['edit_date'], $r['display_name'], $r['initials']);
+                $messages[] = $m;
+            }
+        }
+
+        return $messages;
+    }
+
+    public static function get_before($channel_id, $before_m_id, $announcement = false)
+    {
+        global $user;
+        if (!does_user_have_access($user->uid, $channel_id)) {
+            return ['error' => "Forbidden"];
+        }
+        global $conn;
+        $sql = "SELECT `messages`.*, `users`.`first_name`, `users`.`last_name`, `users`.`display_name` FROM `messages` LEFT JOIN `users` ON `messages`.`uid` = `users`.`uid` WHERE `messages`.`ch_id` = '" . $conn->real_escape_string($channel_id) . "'";
+        if ($announcement) {
+            $sql .= " AND (`messages`.`flags` & (1 << 0)) = 1";
+        }
+        $sql .= " AND `messages`.`send_date` <= ( SELECT `send_date` FROM `messages` WHERE `m_id` = '" . $conn->real_escape_string($before_m_id) . "' LIMIT 1 )";
+        $sql .= " ORDER BY `messages`.`send_date` DESC LIMIT 10;";
+
+        $result = $conn->query($sql);
+
+        $messages = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $r = self::message_parser_helper($row);
+            if ($r['m_id'] != $before_m_id) { // filter out current message
+                $m = new Message($r['m_id'], $r['uid'], $r['message'], $r['ch_id'], $r['flags'], $r['send_date'], $r['edit_date'], $r['display_name'], $r['initials']);
+                $messages[] = $m;
+            }
+        }
+
+        return $messages;
+    }
+
+    // Modifies the message object before doing anything with it
+    private static function message_parser_helper($row)
+    {
+        if ($row['display_name'] == NULL || $row['display_name'] == NULL || $row['display_name'] == NULL) {
+            $row['display_name'] = "Deleted User";
+            $row["initials"] = "NA";
+        } else {
+            $row['display_name'] = get_display_name($row['first_name'], $row['last_name'], $row['display_name']);
+            $row['initials'] = substr($row['first_name'], 0, 1) . substr($row['last_name'], 0, 1);
+        }
+        unset($row['first_name']);
+        unset($row['last_name']);
+        return $row;
+    }
+}

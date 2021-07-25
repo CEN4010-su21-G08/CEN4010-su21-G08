@@ -1,15 +1,14 @@
 <?php
-
     class CourseMembership {
         public $uid = null;
         public $ch_id = null;
-        public $type = null;
+        public $role = null;
 
         function __construct($uid, $ch_id) 
         {
             global $conn;
 
-            $sql = "SELECT * FROM `courseMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($course_id) . "'";
+            $sql = "SELECT * FROM `courseMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
             $result = $conn->query($sql);
             // $statement = $conn->prepare($sql);
 
@@ -24,13 +23,13 @@
 
             $courseMembership = $result->fetch_assoc();
 
-            $this->$uid = courseMembership['uid'];
-            $this->ch_id = courseMembership['ch_id'];
-            $this->type = courseMembership['type'];
+            $this->uid = $courseMembership['uid'];
+            $this->ch_id = $courseMembership['ch_id'];
+            $this->role = $courseMembership['role'];
         }
 
         public static function is_user_member($uid, $ch_id) {
-            if (new CourseMembership($uid, $ch_id) != null) {
+            if ((new CourseMembership($uid, $ch_id))->uid != null) {
                 return true;
             } else {
                 return false;
@@ -88,7 +87,7 @@
             // $rows = $result->fetch_all(MYSQLI_ASSOC);
             $out = array();
             while ($row = $result->fetch_assoc()) {
-                $c = new Course();
+                $c = new CourseWithMembership();
                 $c->course_code = $row['course_code'];
                 $c->section_number = $row['section_number'];
                 $c->instructor_email = $row['instructor_email'];
@@ -96,13 +95,14 @@
                 $c->instructor_name = $row['instructor_name'];
                 $c->course_description = $row['course_description'];
                 $c->course_name = $row['course_name'];
+                $c->role = $row['role'];
                 $out[] = $c;
             }
 
             return $out;
-        } // includes instance of Course
+        } // includes instance of CourseWithMembership
         
-        public static function create_membership($uid, $course_id, $role = 1)
+        public static function create_membership($uid, $ch_id, $role = 1)
         {
             // $uid = $_SESSION['uid'];
     
@@ -114,7 +114,36 @@
             $statement->bind_param("ssi", $uid, $ch_id, $role);
             $statement->execute();
         }
+
+        public static function get_users_in_course($course_id)
+        {
+            global $conn;
+
+            $sql = "SELECT `uid` FROM `courseMembership` WHERE `courseMembership`.`ch_id` = '" . $conn->real_escape_string($course_id) . "'";
+
+            $result = $conn->query($sql);
+
+            $numRows = mysqli_num_rows($result);
+            if ($numRows <= 0) {
+                return array();
+            }
+
+            $out = array();
+            while ($row = $result->fetch_assoc()) {
+                $out[] = new User($row['uid']);
+            }
+
+            return $out;
+        }
     };
+
+    class CourseWithMembership extends Course {
+        public $role = null;
+
+        public function is_instructor () {
+            return ($this->role == 2);
+        }
+    }
 
     class Course {
         public $course_code = null;
@@ -163,9 +192,52 @@
 
             return $courses;
         }
+
+        public static function search_course_names($course_code = "", $section_number = "") {
+            if ($course_code == "" && $section_number == "") {
+                return;
+            }
+            if (!is_string($course_code) || !is_string($section_number)) {
+                return;
+            }
+            $course_code = strtoupper($course_code);
+            $section_number = strtoupper($section_number);
+
+            global $conn;
+            $sql = "SELECT `course_code`, `section_number`, `course_id` FROM `courses` WHERE";
+            if ($course_code != "") {
+                $sql .= " `course_code` LIKE '" . $conn->real_escape_string($course_code) . "%'";
+            }
+            if ($course_code != "" && $section_number != "") {
+                $sql .= " AND";
+            }
+            if ($section_number != "") {
+                $sql .= " `section_number` LIKE '" . $conn->real_escape_string($section_number) . "%'";
+            }
+            $sql .= " LIMIT 30";
+            $result = $conn->query($sql);
+
+            $results = [];
+            while ($row = $result->fetch_assoc()) {
+                $results[] = new CourseSearchResult($row['course_code'], $row['section_number'], $row['course_id']);
+            }
+
+            return $results;
+        }
+
         public static function create_course() {}
         public static function update_course() {}
     };
 
-    
+    class CourseSearchResult {
+        public $course_code = null;
+        public $section_number = null;
+        public $course_id = null;
+
+        public function __construct($course_code, $section_number, $course_id) {
+            $this->course_code = $course_code;
+            $this->section_number = $section_number;
+            $this->course_id = $course_id;
+        }
+    }
 ?>

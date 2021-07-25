@@ -1,26 +1,41 @@
 <?php
     $page_title = "Sign in";
     $auth_needed = false;
+    $center_page = true;
 ?>
 <?php require_once("lib/page-setup.php") ?>
 <?php 
 function renderSignInPage($error = "") { 
     include('common/header.php');
     ?>
-    
-    <a class="btn btn-outline-primary" href="signup.php">Sign up</a>
+    <div class="signinupdiv">
+        <h2 class="maintitleheader">Sign In</h2>
+        <hr/>
+        <p>Please sign in below</p>
+    <p>
+        Don't have an account? <a class="link-no-history link-no-underline" href="signup.php">Sign up here</a>
+    </p>
     <?php if (isset($_GET['r'])) { ?>
         <div class="alert alert-warning" style="margin: 5px 15px;">
             You need to be signed in to access that page.
          </div>
     <?php } ?>
-    <form method="post" action="<?php echo(htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
+    <form class="burrow-form sign-in-form" method="post" action="<?php echo(htmlspecialchars($_SERVER['PHP_SELF'])); ?>">
         <span style="color: #cc0000;"><?php echo $error; ?></span>
         <br />
-        <input name="email" placeholder="email" <?php if ($error != '') {?>value="<?php echo htmlspecialchars($_POST['email']); ?>"<?php } ?> /><br />
-        <input name="password" type="password" placeholder="password" /><br />
-        <button type="submit">Submit</button>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input class="form-control" name="email" placeholder="example@fau.edu" id="email" <?php if ($error != '') {?>value="<?php echo htmlspecialchars($_POST['email']); ?>"<?php } ?> />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input class="form-control" name="password" type="password" placeholder="Password" id="password"/>
+        </div>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </div>
     </form>
+    </div>
 <?php }
 ?>
 <?php
@@ -30,8 +45,8 @@ function renderSignInPage($error = "") {
         if ($em == NULL || $p == NULL) {
             renderSignInPage('Invalid email address or password');
         } else {
-            $s = sign_in_user($em, $p);
-            if ($s == 0) {
+            $s = User::sign_in($em, $p);
+            if ($s->uid == null) {
                 renderSignInPage('Invalid email address or password');
             } else {
                 header("Location: courses.php");
