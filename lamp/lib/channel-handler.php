@@ -107,7 +107,54 @@
             return $channel;
         }
 
-        public static function delete_channel() {}
+        public static function delete_channel($ch_id)
+        {
+            global $conn;
+
+            $sql = "DELETE FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+
+            $conn->query($sql);
+
+            $sql = "DELETE FROM `groupMembership` WHERE `ch_id` ='" . $conn->real_escape_string($ch_id) . "'";
+
+            $conn->query($sql);
+
+            $sql = "DELETE FROM `messages` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+
+            $conn->query($sql);
+        }
+
+        public static function get_members($ch_id)
+        {
+            global $conn;
+
+            $channel = new Channel($ch_id);
+
+            if ($channel->type == 2)
+            {
+                $sql = "SELECT `uid` from `groupMembership` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+
+                $result = $conn->query($sql);
+            }
+            else
+            {
+                $sql = "SELECT `uid` from `courseMembership` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+
+                $result = $conn->query($sql);
+            }
+
+            $numRows = mysqli_num_rows($result);
+            if ($numRows <= 0) {
+                $out = array();
+            }
+
+            $out = array();
+            while ($row = $result->fetch_assoc()) {
+                $out[] = new User($row['uid']);
+            }
+
+            return $out;
+        }
     }
 
 class GroupMembership
