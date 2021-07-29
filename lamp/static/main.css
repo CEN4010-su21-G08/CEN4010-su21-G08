@@ -348,3 +348,24 @@ form.sign-in-form, form.sign-up-form {
 .main-content {
     min-width: 30%;
 }
+
+.btn-toggle-nav a.c-menu-icon {
+    padding: 3px;
+    text-decoration: none;
+    color: black;
+}
+.btn-toggle-nav a {
+    vertical-align: middle;
+}
+.btn-toggle-nav a.c-menu-icon>svg {
+    transition: ease-in-out 100ms;
+    width: 16px;
+    height: 16px;
+}
+
+
+
+.btn-toggle-nav a.c-menu-icon:hover>svg {
+    width: 20px;
+    height: 20px;
+}
