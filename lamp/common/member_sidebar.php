@@ -7,6 +7,7 @@ function show_member_sidebar($channel_type, $is_instructor, $members, $ch_id) {
 
     $active_page = null;
     // if ()
+    return;
 ?>
     <div class="right_sidebar">
         <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
