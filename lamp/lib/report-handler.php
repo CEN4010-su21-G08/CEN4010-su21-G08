@@ -57,15 +57,37 @@ class Report
         return new Report($r_id);
     }
 
-    public static function list_courseReports($course_id) {
-
+    public static function list_by_courseReports($course_id) {
+        global $conn;
+        $sql = "SELECT * FROM `reports` WHERE 'course_id' = '" . $conn->real_escape_string($course_id) . "'";
+        $result = $conn->query($sql);
+        $out = array();
+            while ($row = $result->fetch_assoc()) {
+                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message']);
+            }
+            return $out;
     }
     
-    public static function list_reportedUser($user_id) {
-        
+    public static function list_by_reportedUser($user_id) {
+        global $conn;
+        $sql = "SELECT * FROM `reports` WHERE 'reported' = '" . $conn->real_escape_string($user_id) . "'";
+        $result = $conn->query($sql);
+        $out = array();
+            while ($row = $result->fetch_assoc()) {
+                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message']);
+            }
+            return $out;
     }
 
-    public static function list_reporter($user_id) {
+    public static function list_by_reporter($user_id) {
+        global $conn;
+        $sql = "SELECT * FROM `reports` WHERE 'reporter' = '" . $conn->real_escape_string($user_id) . "'";
+        $result = $conn->query($sql);
+        $out = array();
+            while ($row = $result->fetch_assoc()) {
+                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message']);
+            }
+            return $out;
     }
 
     public static function create($reported, $reason, $m_id, $ch_id) {
