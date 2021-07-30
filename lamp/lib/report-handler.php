@@ -11,8 +11,9 @@ class Report
     public $ch_id = null;
     public $course_id = null;
     public $message = null;
+    public $flags = null;
 
-    function __construct($r_id = null, $reported = null, $reporter = null, $report_date = null, $reason = null, $m_id = null, $ch_id = null, $course_id = null, $message = null) {
+    function __construct($r_id = null, $reported = null, $reporter = null, $report_date = null, $reason = null, $m_id = null, $ch_id = null, $course_id = null, $message = null, $flags = null) {
         if ($r_id == null) {
             // do nothing
         } else if ($reported == null) {
@@ -37,6 +38,7 @@ class Report
                 $this->ch_id = $report['ch_id'];
                 $this->course_id = $report['course_id'];
                 $this->message = $report['message'];
+                $this->flags = $report['flags'];
             }
 
         } else {
@@ -49,6 +51,7 @@ class Report
             $this->ch_id = $ch_id;
             $this->course_id = $course_id;
             $this->message = $message;
+            $this->flags = $flags;
         }
     }
 
@@ -63,7 +66,7 @@ class Report
         $result = $conn->query($sql);
         $out = array();
             while ($row = $result->fetch_assoc()) {
-                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message']);
+                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
             }
             return $out;
     }
@@ -74,7 +77,7 @@ class Report
         $result = $conn->query($sql);
         $out = array();
             while ($row = $result->fetch_assoc()) {
-                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message']);
+                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
             }
             return $out;
     }
@@ -85,7 +88,7 @@ class Report
         $result = $conn->query($sql);
         $out = array();
             while ($row = $result->fetch_assoc()) {
-                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message']);
+                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
             }
             return $out;
     }
@@ -98,19 +101,18 @@ class Report
         $course_id = $channel->course_id;
 
         $m = Message::get($m_id);
-        $message = $message->message;
+        $message = $m->message;
     }
 
     
 
 
-    public function delete() {
 
-    }
 
     public function ignore() {
 
     }
+    
 
     /* Report Actions */
     public function deleteMessage() {
