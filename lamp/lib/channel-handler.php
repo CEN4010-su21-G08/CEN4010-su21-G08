@@ -150,7 +150,9 @@
 
             $out = array();
             while ($row = $result->fetch_assoc()) {
-                $out[] = new User($row['uid']);
+                $member = new User($row['uid'], null, ["uid", "first_name", "last_name", "display_name"]); 
+                $member->display_name = get_display_name($member->first_name, $member->last_name, $member->display_name);
+                $out[] = $member;
             }
 
             return $out;

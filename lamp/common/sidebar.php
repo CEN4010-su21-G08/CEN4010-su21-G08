@@ -1,6 +1,6 @@
 <?php
 // Sidebar from https://getbootstrap.com/docs/5.0/examples/sidebars/# 
-function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructor, $members = [])
+function show_sidebar($heading, $course_name, $course_id, $channel_name,  $groups, $is_instructor, $members = [])
 {
     global $sidebar_shown;
     global $center_page;
@@ -69,37 +69,51 @@ function show_sidebar($heading, $course_name, $course_id, $groups, $is_instructo
             </ul>
         </div>
     </div>
-    <div id="myModal" class="modal" tabindex="-1">
+    
+    <div id="members_modal" class="modal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Members</h5>
+                    <h5 class="modal-title">Members in <?= htmlspecialchars($channel_name); ?></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Modal body text goes here.</p>
+                <?php if (count($members) > 0) { ?>
+                    <ul><?php 
+                        foreach($members as $member) {
+                            ?>
+                            <li><?= htmlspecialchars($member->display_name); ?></li>
+                            <?php 
+                        }
+                        ?></ul>
+                    <?php } else {
+                        ?>No members<?php 
+                    } ?>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
         $(".c-show-members").click(event => {
+            event.preventDefault();
             let $t = $(event.target);
             let ch_id = $t.attr('data-ch-id');
             let is_current = $t.siblings().hasClass("active");
 
             if (!is_current) {
-                console.log('not current');
                 window.location.href = "channels.php?ch_id=" + encodeURIComponent(ch_id) + "&members"
             } else {
-                console.log('current');
-                new bootstrap.Modal(document.getElementById('myModal'), {}).show();
+                new bootstrap.Modal(document.getElementById('members_modal'), {}).show();
             }
         });
+        <?php if (isset($_GET['members'])) { ?>
+            new bootstrap.Modal(document.getElementById('members_modal'), {}).show();
+            // remove "members" from url so it doesnt become annoying:
+            window.history.replaceState({}, document.title, "channels.php?ch_id=<?= urlencode(htmlspecialchars($_GET['ch_id']));?>");
+        <?php } ?>
     </script>
     <div class="main-content<?php if (isset($center_page)) { ?> main-content-center<?php } ?>">
 

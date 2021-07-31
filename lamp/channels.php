@@ -1,7 +1,6 @@
 <?php
 $page_title = "Channels";
 $include_sidebar = true;
-$include_member_sidebar = true;
 ?>
 <?php require_once("lib/page-setup.php"); ?>
 <?php include('lib/message-handler.php'); ?>
@@ -28,12 +27,17 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     if (!$has_access) { ?>
         <div class="alert alert-danger" style="margin: 20px;">You don't have access to this channel or it doesn't exist</div>
     <?php } else {
-        $groups = Channel::get_users_channels_in_course($_SESSION['uid'], $channel->course_id, true);
-        $users = Channel::get_members($channel->ch_id);
+        $groups = Channel::get_users_channels_in_course($user->uid, $channel->course_id, true);
+        if ($channel->type == 2) {
+            $members = Channel::get_members($channel->ch_id);
+        } else {
+            $members = [];
+        }
+
     ?>
-        <?php 
-        show_sidebar("Course", $course->course_code . "-" . $course->section_number, $channel->course_id, $groups, $is_instructor); 
-        show_member_sidebar($channel->type, $is_instructor, $users, $channel_id); ?>
+        <?php
+        show_sidebar("Course", $course->course_code . "-" . $course->section_number, $channel->course_id, $channel->name, $groups, $is_instructor, $members);
+        ?>
         <div class="channels_main">
             <div>
                 <h2>
