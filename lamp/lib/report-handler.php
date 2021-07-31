@@ -1,5 +1,7 @@
 <?php
 
+require_once("lib/message-handler.php");
+
 class Report
 {
     public $r_id = null;
@@ -115,8 +117,16 @@ class Report
     
 
     /* Report Actions */
+    /*deletes the message */
     public function deleteMessage() {
+        $m = Message::get($this->m_id);
 
+        $m->delete();
+
+        global $conn;
+
+        $sql = "UPDATE `reports` SET `flags` = flags | (1 << 1) WHERE `r_id` = '". $conn->real_escape_string($this->r_id) ."'";
+        $conn->query($sql);
     }
 
     public function muteUser() {
