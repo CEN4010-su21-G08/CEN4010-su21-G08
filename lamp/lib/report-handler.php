@@ -15,13 +15,14 @@ class Report
     public $message = null;
     public $flags = null;
 
-    function __construct($r_id = null, $reported = null, $reporter = null, $report_date = null, $reason = null, $m_id = null, $ch_id = null, $course_id = null, $message = null, $flags = null) {
+    function __construct($r_id = null, $reported = null, $reporter = null, $report_date = null, $reason = null, $m_id = null, $ch_id = null, $course_id = null, $message = null, $flags = null)
+    {
         if ($r_id == null) {
             // do nothing
         } else if ($reported == null) {
             // query db with $r_id
             global $conn;
-            
+
             $sql = "SELECT * FROM `reports` WHERE `r_id` = '" . $conn->real_escape_string($r_id) .  "'";
             $result = $conn->query($sql);
 
@@ -30,7 +31,7 @@ class Report
                 // do nothing (no matching report)
             } else {
                 $report = $result->fetch_assoc();
-                
+
                 $this->r_id = $report['r_id'];
                 $this->reported = $report['reported'];
                 $this->reporter = $report['reporter'];
@@ -42,7 +43,6 @@ class Report
                 $this->message = $report['message'];
                 $this->flags = $report['flags'];
             }
-
         } else {
             $this->r_id = $r_id;
             $this->reported = $reported;
@@ -57,45 +57,50 @@ class Report
         }
     }
 
-    public static function get($r_id) {
+    public static function get($r_id)
+    {
         // helper function
         return new Report($r_id);
     }
 
-    public static function list_by_courseReports($course_id) {
+    public static function list_by_courseReports($course_id)
+    {
         global $conn;
         $sql = "SELECT * FROM `reports` WHERE 'course_id' = '" . $conn->real_escape_string($course_id) . "'";
         $result = $conn->query($sql);
         $out = array();
-            while ($row = $result->fetch_assoc()) {
-                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
-            }
-            return $out;
+        while ($row = $result->fetch_assoc()) {
+            $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
+        }
+        return $out;
     }
-    
-    public static function list_by_reportedUser($user_id) {
+
+    public static function list_by_reportedUser($user_id)
+    {
         global $conn;
         $sql = "SELECT * FROM `reports` WHERE 'reported' = '" . $conn->real_escape_string($user_id) . "'";
         $result = $conn->query($sql);
         $out = array();
-            while ($row = $result->fetch_assoc()) {
-                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
-            }
-            return $out;
+        while ($row = $result->fetch_assoc()) {
+            $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
+        }
+        return $out;
     }
 
-    public static function list_by_reporter($user_id) {
+    public static function list_by_reporter($user_id)
+    {
         global $conn;
         $sql = "SELECT * FROM `reports` WHERE 'reporter' = '" . $conn->real_escape_string($user_id) . "'";
         $result = $conn->query($sql);
         $out = array();
-            while ($row = $result->fetch_assoc()) {
-                $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
-            }
-            return $out;
+        while ($row = $result->fetch_assoc()) {
+            $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
+        }
+        return $out;
     }
 
-    public static function create($reported, $reason, $m_id, $ch_id) {
+    public static function create($reported, $reason, $m_id, $ch_id)
+    {
         global $user;
         $reporter = $user->uid;
 
@@ -106,39 +111,42 @@ class Report
         $message = $m->message;
     }
 
-    
 
 
 
 
-    public function ignore() {
-
+    /*marks report as ignored by setting 0th bit of "flags" to 1 */
+    public function ignore()
+    {
+        global $conn;
+        $sql = "UPDATE `reports` SET `flags` = flags | (1 << 0) WHERE `r_id` = '" . $conn->real_escape_string($this->r_id) . "'";
+        $conn->query($sql);
     }
-    
+
 
     /* Report Actions */
     /*deletes the message */
-    public function deleteMessage() {
+    public function deleteMessage()
+    {
         $m = Message::get($this->m_id);
 
         $m->delete();
 
         global $conn;
 
-        $sql = "UPDATE `reports` SET `flags` = flags | (1 << 1) WHERE `r_id` = '". $conn->real_escape_string($this->r_id) ."'";
+        $sql = "UPDATE `reports` SET `flags` = flags | (1 << 1) WHERE `r_id` = '" . $conn->real_escape_string($this->r_id) . "'";
         $conn->query($sql);
     }
-
-    public function muteUser() {
-
-    }
-
-    public function kickUser() {
+    /*mutes user */
+    public function muteUser(){
 
     }
+    /*kicks user */
+    public function kickUser(){
 
-    public function banUser() {
+    }
+    /*bans user */
+    public function banUser(){
 
     }
 }
-
