@@ -99,8 +99,9 @@ class Report
         return $out;
     }
 
-    public static function create($reported, $reason, $m_id, $ch_id)
+    public static function create($reason, $m_id, $ch_id)
     {
+        global $conn;
         global $user;
         $reporter = $user->uid;
 
@@ -109,10 +110,44 @@ class Report
 
         $m = Message::get($m_id);
         $message = $m->message;
+        $reported = $m->uid;
+
+        // a bit redundant perhaps because the channel ID should be retrieved from the database, 
+        // but this should result in fewer unnecessary database requests.
+        if ($m->ch_id != $ch_id) {
+            return ['error' => "Invalid channel ID provided", 'status' => 400];
+        }
+
+        $r_id = generateRandomString();
+
+        $columns = ["r_id", 'reported', 'reporter', 'm_id', 'ch_id', 'course_id', 'message', 'reason'];
+        $values = [$r_id, $reported, $reporter, $m->m_id, $m->ch_id, $course_id, $message, $reason];
+
+        $first = true;
+        $sql = "INSERT INTO `reports` (";
+
+        foreach ($columns as $col) {
+            if ($first) $first = false;
+            else $sql .= ", ";
+            $sql .= "`" . $col . "`";
+        }
+
+        $sql .= ") VALUES (";
+
+        $first = true;
+        foreach ($values as $value) {
+            if ($first) $first = false;
+            else $sql .= ", ";
+
+            $sql .= "'" . $conn->real_escape_string($value) . "'";
+        }
+
+        $sql .= ")";
+
+        $conn->query($sql);
+
+        return [];
     }
-
-
-
 
 
     /*marks report as ignored by setting 0th bit of "flags" to 1 */
