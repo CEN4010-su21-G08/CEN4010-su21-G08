@@ -115,7 +115,7 @@
 
             $conn->query($sql);
 
-            $sql = "DELETE FROM `groupMembership` WHERE `ch_id` ='" . $conn->real_escape_string($ch_id) . "'";
+            $sql = "DELETE FROM `groupmembership` WHERE `ch_id` ='" . $conn->real_escape_string($ch_id) . "'";
 
             $conn->query($sql);
 
@@ -214,5 +214,14 @@ class GroupMembership
 
             return $groupMembership;
             }
+        }
+    
+        public static function delete_membership($uid, $ch_id)
+        {
+            global $conn;
+
+            $sql = "DELETE FROM `groupmembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+
+            $conn->query($sql);
         }
 }
