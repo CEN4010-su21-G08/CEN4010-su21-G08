@@ -140,7 +140,7 @@
         {
             global $conn;
 
-            $sql = "DELETE FROM `coursemembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($course_id) . "'";
+            $sql = "DELETE FROM `courseMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($course_id) . "'";
 
             $conn->query($sql);
         }

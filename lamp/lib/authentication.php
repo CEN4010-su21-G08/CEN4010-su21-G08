@@ -22,13 +22,13 @@
     require_once("lib/googleapis/vendor/autoload.php");
     require_once("lib/googleapis-config.php");
 
-    /*$client = new Google\Client();
+    $client = new Google\Client();
     $client->setClientId($google_client_id);
     $client->setClientSecret($google_client_secret);
     $client->setRedirectUri($google_redirect_uri);
     $client->addScope("email");
     $client->addScope("profile");
-    $client->setAccessType("offline"); */
+    $client->setAccessType("offline"); 
     
 
     class User {
