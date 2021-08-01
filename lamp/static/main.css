@@ -121,7 +121,7 @@ main {
     overflow-x: auto;
     overflow-y: hidden;
     float: right;
-    margin-left: auto; 
+    margin-left: auto;
     margin-right: 0;
 }
 
@@ -254,6 +254,7 @@ form.sign-in-form, form.sign-up-form {
 .link-no-history:visited {
     color: #0d6efd;
 }
+
 .link-no-history:visited:hover {
     color: #0a58ca;
 }
@@ -264,17 +265,17 @@ form.sign-in-form, form.sign-up-form {
 
 .dropdown-check-list {
     display: inline-block;
-  }
-  
-  .dropdown-check-list .anchor {
+}
+
+.dropdown-check-list .anchor {
     position: relative;
     cursor: pointer;
     display: inline-block;
     padding: 5px 50px 5px 10px;
     border: 1px solid #ccc;
-  }
-  
-  .dropdown-check-list .anchor:after {
+}
+
+.dropdown-check-list .anchor:after {
     position: absolute;
     content: "";
     border-left: 2px solid black;
@@ -287,43 +288,47 @@ form.sign-in-form, form.sign-up-form {
     -o-transform: rotate(-135deg);
     -webkit-transform: rotate(-135deg);
     transform: rotate(-135deg);
-  }
-  
-  .dropdown-check-list .anchor:active:after {
+}
+
+.dropdown-check-list .anchor:active:after {
     right: 8px;
     top: 21%;
-  }
-  
-  .dropdown-check-list ul.items {
+}
+
+.dropdown-check-list ul.items {
     padding: 2px;
     display: none;
     margin: 0;
     border: 1px solid #ccc;
     border-top: none;
-  }
-  
-  .dropdown-check-list ul.items li {
+}
+
+.dropdown-check-list ul.items li {
     list-style: none;
-  }
-  
-  .dropdown-check-list.visible .anchor {
+}
+
+.dropdown-check-list.visible .anchor {
     color: #0094ff;
-  }
-  
-  .dropdown-check-list.visible .items {
+}
+
+.dropdown-check-list.visible .items {
     display: block;
-  }
+}
+
 .message_author {
     display: inline;
     margin-right: 15px;
 }
+
 .badge .announcement {
     margin-left: 15px;
     display: inline-block;
 }
+
 .message {
     padding: 10px;
 }
+
 .announcement-message {
     background-color: #e6bc04;
     border-radius: 3px;
@@ -354,18 +359,28 @@ form.sign-in-form, form.sign-up-form {
     text-decoration: none;
     color: black;
 }
+
 .btn-toggle-nav a {
     vertical-align: middle;
 }
+
 .btn-toggle-nav a.c-menu-icon>svg {
     transition: ease-in-out 100ms;
     width: 16px;
     height: 16px;
 }
 
-
-
 .btn-toggle-nav a.c-menu-icon:hover>svg {
     width: 20px;
     height: 20px;
+}
+
+#context_menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    z-index:200;
+    /* display: */
 }
