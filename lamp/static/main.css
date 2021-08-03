@@ -376,11 +376,10 @@ form.sign-in-form, form.sign-up-form {
 }
 
 #context_menu {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 200px;
     height: 200px;
-    z-index:200;
-    /* display: */
+    z-index: 200;
 }
