@@ -66,6 +66,12 @@ function show_sidebar($heading, $course_name, $course_id, $channel_name,  $group
                         <a href="create-group.php?course_id=<?= urlencode($course_id); ?>" class="link-dark rounded">Create Group</a>
                     </li>
                 <?php } ?>
+                <?php
+                if ($is_instructor) { ?>
+                    <li class="mb-1">
+                        <a href="manage-course.php?course_id=<?= urlencode($course_id); ?>" class="link-dark rounded">Manage Course</a>
+                    </li>
+                <?php } ?>
             </ul>
         </div>
     </div>

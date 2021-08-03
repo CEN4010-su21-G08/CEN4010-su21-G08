@@ -1,4 +1,8 @@
 <?php
+require_once("lib/authentication.php");
+require_once("lib/channel-handler.php");
+require_once("lib/Channel-handler.php");
+
 class Punishment
 {
     public $p_id = null;

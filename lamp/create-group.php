@@ -1,5 +1,5 @@
 <?php
-$page_title = "Create/Delete a Group";
+$page_title = "Create a Group";
 $include_sidebar = true;
 ?>
 <?php require_once("lib/page-setup.php"); ?>
@@ -23,9 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     <?php } else {
         $users_in_course = CourseMembership::get_users_in_course($course->course_id);
         $groups = Channel::get_users_channels_in_course($_SESSION['uid'], $course_id, true); ?>
-        <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $course_id, $groups, $is_instructor); ?>
+        <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $course_id, null, $groups, $is_instructor); ?>
         <div class="channels_main">
-        <h2>Create/Delete a Group</h2>
+        <h2>Create a Group</h2>
         <?php 
             function render_create_group_page($error=null) { ?>
                 <?php
