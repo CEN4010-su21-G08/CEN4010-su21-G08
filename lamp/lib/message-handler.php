@@ -190,4 +190,21 @@ class Message
             $conn->query($sql);
         }
     }
+
+    public function edit($new_message)
+    {
+        if ($this->m_id == null)
+        {
+            // no message to edit
+        }
+        else
+        {
+            global $conn;
+
+            $sql = "UPDATE `messages` SET `message` = '" . $conn->real_escape_string($new_message) . "' WHERE `m_id` = '" . $conn->real_escape_string($this->m_id) . "'";
+            $conn->query($sql);
+
+            $this->message = $new_message;
+        }
+    }
 }

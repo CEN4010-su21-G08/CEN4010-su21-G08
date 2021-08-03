@@ -77,7 +77,7 @@
             return $out;
         }
 
-        public static function create_channel($course_id, $name=null, $type=1)
+        public static function create_channel($course_id, $name=null, $type=1, $ch_id = null)
         {
             global $conn;
             /*
@@ -89,7 +89,8 @@
             if (!isset($course_id))
                 throwError(500, "Error creating channel: course does not exist");
             
-            $ch_id = generateRandomString();
+            if (!isset($ch_id))
+                $ch_id = generateRandomString();
 
             $sql = "INSERT INTO `channels` (`ch_id`,";
             if (isset($name)) $sql .= "`name`,";
