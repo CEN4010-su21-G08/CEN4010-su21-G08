@@ -135,6 +135,15 @@
 
             return $out;
         }
+
+        public static function delete_membership($uid, $course_id)
+        {
+            global $conn;
+
+            $sql = "DELETE FROM `courseMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($course_id) . "'";
+
+            $conn->query($sql);
+        }
     };
 
     class CourseWithMembership extends Course {
