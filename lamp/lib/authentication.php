@@ -205,23 +205,9 @@
                 return "Passwords do not match";
             }
 
-            if (strlen($password) < 8) {
-                return "Your password must be at least 8 characters long.";
-            }
-            
-            $one_upper = preg_match("/[A-Z]/", $password);
-            $one_lower = preg_match("/[a-z]/", $password);
-            $one_number = preg_match("/[0-9]/", $password);
-            $one_symbol = preg_match("/\W/", $password);
-
-            $cnt = 0;
-            if ($one_upper) { $cnt++; }; 
-            if ($one_lower) { $cnt++; }; 
-            if ($one_number) { $cnt++; }; 
-            if ($one_symbol) { $cnt++; }; 
-
-            if ($cnt < 3) {
-                return "Your password must contain at least three of the following: (a) one number, (b) one lowercase letter, (c) one uppercase letter, (d) one symbol. Please choose a strong password";
+            if (!User::validate_password($password))
+            {
+                return "Your password must be at least 8 characters long and must contain at least three of the following: (a) one number, (b) one lowercase letter, (c) one uppercase letter, (d) one symbol.";
             }
 
 
@@ -393,6 +379,22 @@
                 //do nothing
             }
             $conn->query($sql);
+        }
+        private static function validate_password($password)
+        {
+            $one_upper = preg_match("/[A-Z]/", $password);
+            $one_lower = preg_match("/[a-z]/", $password);
+            $one_number = preg_match("/[0-9]/", $password);
+            $one_symbol = preg_match("/\W/", $password);
+
+            $cnt = 0;
+            if ($one_upper) $cnt++; 
+            if ($one_lower) $cnt++; 
+            if ($one_number) $cnt++; 
+            if ($one_symbol) $cnt++;
+
+            if (strlen($password) >= 8 && $cnt >= 3) return true;
+            else return false;
         }
     }
 
