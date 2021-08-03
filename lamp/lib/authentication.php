@@ -180,20 +180,20 @@
                 display name: any number (invalid values are already handled properly when used)
             */
             
-            if (!isset($first_name) || $first_name == null || !is_string($first_name) || strlen($first_name) <= 0 || empty($first_name)) {
+            if (!User::validate_string($first_name)) {
                 return "Your first name is required.";
             }
-            if (!isset($last_name) || $last_name == null || !is_string($last_name) || strlen($last_name) <= 0 || empty($last_name)) {
+            if (!User::validate_string($last_name)) {
                 return "Your last name is required.";
             }
-            if (!isset($email) || $email == null || !is_string($email) || strlen($email) <= 0 || empty($email)) {
+            if (!User::validate_string($email)) {
                 return "Your email address is required.";
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return "Your email address is invalid.";
             }
             
-            if (!isset($password) || $password == null || !is_string($password) || empty($password)) {
+            if (!User::validate_string($password)) {
                 return "Your password is required.";
             }
 
@@ -398,13 +398,21 @@
             else return false;
         }
 
+        private static function validate_string($s)
+        {
+            if (!isset($s) || $s == null || !is_string($s) || empty($s)) {
+                return false;
+            }
+            return true;
+        }
+
         public function change_password($old, $new, $new_conf) {
             global $conn;
 
-            if (!isset($new) || $new == null || !is_string($new) || empty($new)) {
+            if (!User::validate_string($new)) {
                 return "New password is required.";
             }
-            if (!isset($old) || $old == null || !is_string($old) || empty($old)) {
+            if (!User::validate_string($old)) {
                 return "Old password is required.";
             }
             if (password_verify($old, $this->password)) {
