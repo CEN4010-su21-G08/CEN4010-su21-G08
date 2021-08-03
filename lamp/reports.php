@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     include('common/header.php');
     if (!isset($_GET['action']) || $_GET['action'] == 'list') {
         // List reports
-
+        include('pages/report-list.php');
     } else {
         $action = $_GET['action'];
         if ($action == "get") {
