@@ -2,6 +2,35 @@
 
 require_once("lib/message-handler.php");
 
+class BasicUserInfo
+{
+    public $uid = null;
+    public $first_name = null;
+    public $last_name = null;
+
+    function __construct($uid, $first_name, $last_name)
+    {
+        $this->uid = $uid;
+        $this->first_name = $first_name;
+        $this->last_name = $last_name;
+    }
+}
+
+class BasicChannelInfo
+{
+    public $ch_id = null;
+    public $ch_name = null;
+    public $ch_course_id = null;
+
+    public $course_id = null;
+    public $course_code = null;
+    public $course_section_number = null;
+
+    function __construct() {
+        
+    }
+}
+
 class Report
 {
     public $r_id = null;
@@ -14,6 +43,11 @@ class Report
     public $course_id = null;
     public $message = null;
     public $flags = null;
+
+    // User objects
+    public $reported_user = null;
+    public $reporter_user = null;
+    public $channel_info = null;
 
     function __construct($r_id = null, $reported = null, $reporter = null, $report_date = null, $reason = null, $m_id = null, $ch_id = null, $course_id = null, $message = null, $flags = null)
     {
@@ -66,11 +100,35 @@ class Report
     public static function list_by_courseReports($course_id)
     {
         global $conn;
-        $sql = "SELECT * FROM `reports` WHERE `course_id` = '" . $conn->real_escape_string($course_id) . "'";
+        $sql = "SELECT `reports`.*, `u_rr`.`first_name` AS `rr_first_name`, `u_rr`.`last_name` AS `rr_last_name`, `u_rd`.`first_name` AS `rd_first_name`, `u_rd`.`last_name` AS `rd_last_name`, `channel`.`name` AS `ch_name`, `channel`.`course_id` AS `ch_course_id`, `course`.`section_number` AS `course_section_number`, `course`.`course_code` AS `course_code` FROM `reports` LEFT JOIN `users` AS `u_rr` ON `u_rr`.`uid` = `reports`.`reporter` LEFT JOIN `users` AS `u_rd` ON `u_rd`.`uid` = `reports`.`reported` LEFT JOIN `channels` AS `channel` ON `channel`.`ch_id` = `reports`.`ch_id` LEFT JOIN `courses` AS `course` ON `course`.`course_id` = `reports`.`course_id` WHERE `reports`.`course_id` = '" . $conn->real_escape_string($course_id) . "'";
         $result = $conn->query($sql);
         $out = array();
         while ($row = $result->fetch_assoc()) {
-            $out[] = new Report($row['r_id'], $row['reported'], $row['reporter'], $row['report_date'], $row['reason'], $row['m_id'], $row['ch_id'], $row['course_id'], $row['message'], $row['flags']);
+            $r = new Report();
+            $r->r_id = $row['r_id'];
+            $r->reported = $row['reported'];
+            $r->reporter = $row['reporter'];
+            $r->report_date = $row['report_date'];
+            $r->reason = $row['reason'];
+            $r->m_id = $row['m_id'];
+            $r->ch_id = $row['ch_id'];
+            $r->course_id = $row['course_id'];
+            $r->message = $row['message'];
+            $r->flags = $row['flags'];
+
+            $r->reporter_user = new BasicUserInfo($row['reporter'], $row['rr_first_name'], $row['rr_last_name']);
+            $r->reported_user = new BasicUserInfo($row['reported'], $row['rd_first_name'], $row['rd_last_name']);
+
+            $r->channel_info = new BasicChannelInfo();
+            $r->channel_info->ch_id = $row['ch_id'];
+            $r->channel_info->ch_name = $row['ch_name'];
+            $r->channel_info->ch_course_id = $row['ch_course_id'];
+
+            $r->channel_info->course_id = $row['course_id'];
+            $r->channel_info->course_code = $row['course_code'];
+            $r->channel_info->course_section_number = $row['course_section_number'];
+
+            $out[] = $r;
         }
         return $out;
     }

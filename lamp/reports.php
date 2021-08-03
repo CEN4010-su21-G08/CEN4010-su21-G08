@@ -63,9 +63,23 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $reason = $_POST['reason'];
 
             $channel = new Channel($ch_id);
-            if ($channel->get_role() == 0) {
-                sendError("Forbidden", 403);
+            if ($channel->ch_id == null) {
+                sendError("Unknown Channel", 400);
             }
+            if ($channel->type == 2) {
+                $course_ch = new Channel($channel->course_id);
+                if ($course_ch->ch_id == null) {
+                    sendError("Unknown Channel", 400);
+                }
+                if ($course_ch->get_role() == 0) {
+                    sendError("Forbidden", 403);
+                }
+            } else {
+                if ($channel->get_role() == 0) {
+                    sendError("Forbidden", 403);
+                }
+            }
+            
             $message = Message::get($m_id);
             if ($message->ch_id == null || $message->ch_id !== $ch_id) {
                 sendError("Mismatched channel provided", 400);
@@ -91,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     include('common/header.php');
     if (!isset($_GET['action']) || $_GET['action'] == 'list') {
         // List reports
-
+        include('pages/report-list.php');
     } else {
         $action = $_GET['action'];
         if ($action == "get") {

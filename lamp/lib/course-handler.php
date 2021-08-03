@@ -349,7 +349,7 @@
 
                 $conn->query($sql);
 
-                $sql = "DELETE FROM `course_membership WHERE `course_id` = '" . $conn->real_escape_string($this->course_id). "'";
+                $sql = "DELETE FROM `course_membership` WHERE `course_id` = '" . $conn->real_escape_string($this->course_id). "'";
 
                 foreach ($channels as $channel)
                 {
