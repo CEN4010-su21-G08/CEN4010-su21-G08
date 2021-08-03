@@ -225,7 +225,7 @@
             }
 
 
-            if (!isset($display_name) || $display_name == null || !is_integer($display_name) || !ctype_digit($display_name)) {
+            if (!isset($display_name) || $display_name == null || !is_integer($display_name)) {
                 return "Your display name option is required.";
             }
 
