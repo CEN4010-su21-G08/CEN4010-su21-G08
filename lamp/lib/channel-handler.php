@@ -186,7 +186,7 @@
                 return 0;
             }
             
-            if ($membership == null || $membership->role == null) {
+            if ($membership == null || !isset($membership->role) || $membership->role == null) {
                 // no corresponding membership found = no access
                 return 0;
             } else {

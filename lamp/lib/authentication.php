@@ -205,23 +205,9 @@
                 return "Passwords do not match";
             }
 
-            if (strlen($password) < 8) {
-                return "Your password must be at least 8 characters long.";
-            }
-            
-            $one_upper = preg_match("/[A-Z]/", $password);
-            $one_lower = preg_match("/[a-z]/", $password);
-            $one_number = preg_match("/[0-9]/", $password);
-            $one_symbol = preg_match("/\W/", $password);
-
-            $cnt = 0;
-            if ($one_upper) { $cnt++; }; 
-            if ($one_lower) { $cnt++; }; 
-            if ($one_number) { $cnt++; }; 
-            if ($one_symbol) { $cnt++; }; 
-
-            if ($cnt < 3) {
-                return "Your password must contain at least three of the following: (a) one number, (b) one lowercase letter, (c) one uppercase letter, (d) one symbol. Please choose a strong password";
+            if (!User::validate_password($password))
+            {
+                return "Your password must be at least 8 characters long and must contain at least three of the following: (a) one number, (b) one lowercase letter, (c) one uppercase letter, (d) one symbol.";
             }
 
 
@@ -382,6 +368,87 @@
                 }
                 $conn->query($sql);
             }
+        }
+        public function change_displayname($display_name)
+        {
+            global $conn;
+            if ($display_name != $this->display_name && is_integer($display_name) && !ctype_digit($display_name)){
+                $display_name = intval($display_name);
+                $sql = "UPDATE `users` SET `display_name` = $display_name WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+            } else {
+                //do nothing
+            }
+            $conn->query($sql);
+        }
+        
+        private static function validate_password($password)
+        {
+            $one_upper = preg_match("/[A-Z]/", $password);
+            $one_lower = preg_match("/[a-z]/", $password);
+            $one_number = preg_match("/[0-9]/", $password);
+            $one_symbol = preg_match("/\W/", $password);
+
+            $cnt = 0;
+            if ($one_upper) $cnt++; 
+            if ($one_lower) $cnt++; 
+            if ($one_number) $cnt++; 
+            if ($one_symbol) $cnt++;
+
+            if (strlen($password) >= 8 && $cnt >= 3) return true;
+            else return false;
+        }
+
+        public function change_password($old, $new, $new_conf) {
+            global $conn;
+
+            if (!isset($new) || $new == null || !is_string($new) || empty($new)) {
+                return "New password is required.";
+            }
+            if (!isset($old) || $old == null || !is_string($old) || empty($old)) {
+                return "Old password is required.";
+            }
+            if (password_verify($old, $this->password)) {
+                return "Old password is incorrect.";
+            }
+            if ($old == $new) {
+                return "New password must be different than old password.";
+            }
+            if ($new == $new_conf) {
+                return "Verified Password does not match.";
+            }
+
+            if (!User::validate_password($new)) {
+                return "Please enter a valid password.";
+            }else {
+                $sql = "UPDATE `users` SET `password` = '" . $conn->real_escape_string($new) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+            }
+            $conn->query($sql);
+        }
+
+        public function change_first($new_first) {
+            global $conn;
+
+            if (!isset($new_first) || $new_first = null || !is_string($new_first) || empty($new_first)) {
+                return "Please enter a first name";
+            }
+            if ($new_first != $this->first_name) {
+                $sql = "UPDATE `users` SET `first_name` = '" . $conn->real_escape_string($new_first) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+            }
+
+            $conn->query($sql);
+        }
+
+        public function change_last($new_last) {
+            global $conn;
+
+            if (!isset($new_last) || $new_last = null || !is_string($new_last) || empty($new_last)) {
+                return "Please enter a last name";
+            }
+            if ($new_last != $this->last_name) {
+                $sql = "UPDATE `users` SET `last_name` = '" . $conn->real_escape_string($new_last) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+            }
+
+            $conn->query($sql);
         }
     }
 
