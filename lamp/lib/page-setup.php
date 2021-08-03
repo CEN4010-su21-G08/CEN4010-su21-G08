@@ -34,8 +34,3 @@
 
     $sidebar_shown = false;
     require_once('common/sidebar.php');
-    $member_sidebar_shown = false;
-    require_once('common/member_sidebar.php');
-
-    
-

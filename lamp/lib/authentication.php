@@ -28,7 +28,7 @@
     $client->setRedirectUri($google_redirect_uri);
     $client->addScope("email");
     $client->addScope("profile");
-    $client->setAccessType("offline");
+    $client->setAccessType("offline"); 
     
 
     class User {
@@ -303,6 +303,24 @@
 
                 header("Location: verify.php?success");
             }
+        } 
+
+        public static function deactivate_account($uid)
+        {
+            global $conn;
+
+            $sql = "UPDATE `users` SET `active` = '0' WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+
+            $conn->query($sql);
+        }
+
+        public static function delete_account($uid)
+        {
+            global $conn;
+
+            $sql = "DELETE FROM `users` WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+
+            $conn->query($sql);
         }
     }
 

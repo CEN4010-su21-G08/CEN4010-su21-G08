@@ -151,10 +151,47 @@
 
             $out = array();
             while ($row = $result->fetch_assoc()) {
-                $out[] = new User($row['uid']);
+                $member = new User($row['uid'], null, ["uid", "first_name", "last_name", "display_name"]); 
+                $member->display_name = get_display_name($member->first_name, $member->last_name, $member->display_name);
+                $out[] = $member;
             }
 
             return $out;
+        }
+
+        /*
+            Channel->get_role
+            Parameters:
+                [$uid] - user ID to get role of (defaults to logged in user)
+            Gets the role of a user and returns that value.
+            Returns: integer,
+                0 = no access
+                1 = student
+                2 = teacher
+                3 = TA (not yet implemented functionality)
+        */
+        public function get_role($uid = null) {
+            if ($uid == null) {
+                global $user;
+                $uid = $user->uid; 
+            }
+            
+            // get a membership based on the channel type
+            $membership = null;
+            if ($this->type == 1) {
+                $membership = new CourseMembership($uid, $this->ch_id);
+            } else if ($this->type == 2) {
+                $membership = new GroupMembership($uid, $this->ch_id);
+            } else {
+                return 0;
+            }
+            
+            if ($membership == null || $membership->role == null) {
+                // no corresponding membership found = no access
+                return 0;
+            } else {
+                return $membership->role;
+            }
         }
     }
 
@@ -215,5 +252,14 @@ class GroupMembership
 
             return $groupMembership;
             }
+        }
+    
+        public static function delete_membership($uid, $ch_id)
+        {
+            global $conn;
+
+            $sql = "DELETE FROM `groupMembership` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+
+            $conn->query($sql);
         }
 }
