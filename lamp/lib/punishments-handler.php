@@ -356,6 +356,12 @@ class Punishment
 
     public static function is_expired($expires_at)
     {
-        return false;
+        $expire_timestamp = strtotime($expires_at);
+
+        $current_time = time();
+
+        $is_expired = $current_time > $expire_timestamp;
+
+        return $is_expired;
     }
 };
