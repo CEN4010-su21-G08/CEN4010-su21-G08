@@ -208,7 +208,7 @@
             }
 
 
-            if (!isset($display_name) || $display_name == null || !is_integer($display_name)) {
+            if (!isset($display_name) || $display_name == null || !is_integer($display_name) || !ctype_digit($display_name)) {
                 return "Your display name option is required.";
             }
 
@@ -222,7 +222,7 @@
             $sql .= "'" . $conn->real_escape_string($last_name) . "'" . ", ";
             $sql .= "'" . $conn->real_escape_string($email) . "'" . ", ";
             $sql .= "'" . $conn->real_escape_string($h_s_pass) . "'" . ", ";
-            $sql .= "" . $conn->real_escape_string($display_name) . "" . "";
+            $sql .= "" . (intval($display_name)) . "" . "";
             $sql .= ")";
 
             $conn->query($sql);
