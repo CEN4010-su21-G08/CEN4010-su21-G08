@@ -30,6 +30,9 @@
     $client->addScope("profile");
     $client->setAccessType("offline"); 
     
+    /* Define User flag constants */
+    // (note: defines shift)
+    define("USER_ACTIVE", 0);
 
     class User {
         public $uid = null;
@@ -41,9 +44,10 @@
         public $created_at = null;
         private $mfa_code = null;
         private $password = null;
+        public $flags = null;
 
         /* $cols should not be user-provided input */
-        function __construct($uid=null, $email=null, $cols=["uid", "email", "first_name", "last_name", "display_name", "google_user_id"]) {
+        function __construct($uid = null, $email = null, $cols = ["uid", "email", "first_name", "last_name", "display_name", "flags", "google_user_id"]) {
             global $conn;
             if ($uid == null && $email == null) {
                 // do nothing
@@ -87,6 +91,7 @@
                     if (in_array('created_at', $cols)) { $this->created_at = $user['created_at']; }
                     if (in_array('mfa_code', $cols)) { $this->mfa_code = $user['mfa_code']; }
                     if (in_array('password', $cols)) { $this->password = $user['password']; }
+                    if (in_array('flags', $cols)) { $this->flags = $user['flags']; }
                 }   
             }
         }
@@ -94,9 +99,14 @@
         public static function sign_in($email_address, $password) {
             global $conn;
             
-            $u = new User(null, $email_address, ["uid", "password", "email", "first_name", "last_name", "display_name"]);
+            $u = new User(null, $email_address, ["uid", "password", "email", "first_name", "last_name", "flags", "display_name"]);
             if ($u->uid != null) {
                 if (password_verify($password, $u->password)) {
+                    // check if not active
+                    if (!$u->get_flag(USER_ACTIVE)) {
+                        // todo: possibly include more specific error
+                        return new User();
+                    }
                     $u->password = null;
                     $u->set_user_session();
                     return $u;
@@ -111,7 +121,13 @@
         private function set_user_session() {
             if ($this->uid != null) {
                 global $conn;
-                $sql = "SELECT `email`, `uid`, `first_name`, `last_name`, `display_name` FROM `users` WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $sql = "SELECT `email`, `uid`, `first_name`, `last_name`, `display_name`, `flags` FROM `users` WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+
+                if (!$this->get_flag(USER_ACTIVE)) {
+                    return;
+                    session_destroy();
+                    session_start();
+                }
                 // $statement = $conn->prepare($sql);
                 // $statement->bind_param("s", $user_uid)
                 $result = $conn->query($sql);
@@ -321,6 +337,37 @@
             $sql = "DELETE FROM `users` WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
 
             $conn->query($sql);
+        }
+        // returns true if the user is active
+        public function is_active() 
+        {
+            return $this->get_flag(USER_ACTIVE);
+        }
+
+        // sets the value of the active flag based on the provided new value
+        public function set_active($newValue)
+        {
+            $this->update_flag(USER_ACTIVE, $newValue);
+        }
+
+        // returns the value of a user's flag
+        private function get_flag($shiftAmt) 
+        {
+            return $this->flags & (1 << $shiftAmt);
+        }
+
+        // updates the value of a user's flag
+        private function update_flag($shiftAmt, $enabled)
+        {
+            global $conn;
+            if (ctype_digit($shiftAmt)) {
+                if ($enabled) {
+                    $sql = "UPDATE `users` SET `flags` = `flags` & ~(1 << " . intval($shiftAmt) . ") WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                } else {
+                    $sql = "UPDATE `users` SET `flags` = `flags` | (1 << " . intval($shiftAmt) . ") WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                }
+                $conn->query($sql);
+            }
         }
     }
 
