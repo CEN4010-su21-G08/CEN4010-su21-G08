@@ -66,7 +66,7 @@ class Report
     public static function list_by_courseReports($course_id)
     {
         global $conn;
-        $sql = "SELECT * FROM `reports` WHERE 'course_id' = '" . $conn->real_escape_string($course_id) . "'";
+        $sql = "SELECT * FROM `reports` WHERE `course_id` = '" . $conn->real_escape_string($course_id) . "'";
         $result = $conn->query($sql);
         $out = array();
         while ($row = $result->fetch_assoc()) {
@@ -78,7 +78,7 @@ class Report
     public static function list_by_reportedUser($user_id)
     {
         global $conn;
-        $sql = "SELECT * FROM `reports` WHERE 'reported' = '" . $conn->real_escape_string($user_id) . "'";
+        $sql = "SELECT * FROM `reports` WHERE `reported` = '" . $conn->real_escape_string($user_id) . "'";
         $result = $conn->query($sql);
         $out = array();
         while ($row = $result->fetch_assoc()) {
@@ -90,7 +90,7 @@ class Report
     public static function list_by_reporter($user_id)
     {
         global $conn;
-        $sql = "SELECT * FROM `reports` WHERE 'reporter' = '" . $conn->real_escape_string($user_id) . "'";
+        $sql = "SELECT * FROM `reports` WHERE `reporter` = '" . $conn->real_escape_string($user_id) . "'";
         $result = $conn->query($sql);
         $out = array();
         while ($row = $result->fetch_assoc()) {
