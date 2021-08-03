@@ -33,6 +33,7 @@
     /* Define User flag constants */
     // (note: defines shift)
     define("USER_ACTIVE", 0);
+    define("USER_ADMIN", 1);
 
     class User {
         public $uid = null;
@@ -338,6 +339,19 @@
 
             $conn->query($sql);
         }
+
+        // sets the value of the admin flag based on the provided new value
+        public function set_admin($newValue)
+        {
+            $this->update_flag(USER_ADMIN, $newValue);
+        }
+
+        // returns true if the user is an admin
+        public function is_admin() 
+        {
+            return $this->get_flag(USER_ADMIN);
+        }
+        
         // returns true if the user is active
         public function is_active() 
         {
