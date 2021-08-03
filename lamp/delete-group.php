@@ -25,9 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     }
     else
     {
-        Channel::delete_channel($channel_id);
-        header("Location: channels.php?ch_id=" . $course->course_id);
-        die();
+        
     }
 } ?>
 

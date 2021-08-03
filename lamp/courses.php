@@ -339,6 +339,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 }
             })
         </script>
+    <?php
+        if ($user->is_admin())
+        { ?>
+            <a href="manage-all-courses.php">Manage all Courses</a>
+        <?php } ?>
     <?php include('common/footer.php');
     }
 } else { ?>

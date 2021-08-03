@@ -108,19 +108,19 @@
             return $channel;
         }
 
-        public static function delete_channel($ch_id)
+        public function delete_channel()
         {
             global $conn;
 
-            $sql = "DELETE FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+            $sql = "DELETE FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($this->ch_id) . "'";
 
             $conn->query($sql);
 
-            $sql = "DELETE FROM `groupMembership` WHERE `ch_id` ='" . $conn->real_escape_string($ch_id) . "'";
+            $sql = "DELETE FROM `groupMembership` WHERE `ch_id` ='" . $conn->real_escape_string($this->ch_id) . "'";
 
             $conn->query($sql);
 
-            $sql = "DELETE FROM `messages` WHERE `ch_id` = '" . $conn->real_escape_string($ch_id) . "'";
+            $sql = "DELETE FROM `messages` WHERE `ch_id` = '" . $conn->real_escape_string($this->ch_id) . "'";
 
             $conn->query($sql);
         }

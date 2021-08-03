@@ -449,7 +449,13 @@
     function is_user_instructor($course_id)
     {
         include_once("lib/course-handler.php");
-        $uid = $_SESSION['uid'];
+        include_once("lib/page-setup.php");
+        global $user;
+        
+        if ($user->is_admin() == true)
+        {
+            return true;
+        }
 
         $Membership = new CourseMembership($uid, $course_id);
         
