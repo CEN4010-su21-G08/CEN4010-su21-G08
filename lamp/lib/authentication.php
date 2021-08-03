@@ -308,8 +308,8 @@
         public static function deactivate_account($uid)
         {
             global $conn;
-
-            $sql = "UPDATE `users` SET `active` = '0' WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+            // turn off the "active" bit in the user's flags
+            $sql = "UPDATE `users` SET `flags` = `flags` & ~(1 << 0) WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
 
             $conn->query($sql);
         }
