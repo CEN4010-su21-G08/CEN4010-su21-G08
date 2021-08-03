@@ -310,7 +310,7 @@ class Punishment
 
         if (isset($type))
         {
-            $sql = "SELECT * FROM `punishments` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `type` = '" . $conn->real_escape_string($ype) . "'";
+            $sql = "SELECT * FROM `punishments` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `type` = '" . $conn->real_escape_string($type) . "'";
 
             $result = $conn->query($sql);
 
