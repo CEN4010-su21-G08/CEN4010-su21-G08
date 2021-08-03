@@ -383,6 +383,17 @@
                 $conn->query($sql);
             }
         }
+        public function change_displayname($display_name)
+        {
+            global $conn;
+            if ($display_name != $this->display_name && is_integer($display_name) && !ctype_digit($display_name)){
+                $display_name = intval($display_name);
+                $sql = "UPDATE `users` SET `display_name` = $display_name WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+            } else {
+                //do nothing
+            }
+            $conn->query($sql);
+        }
     }
 
     /* function sign_in_user($email_address, $password) {
