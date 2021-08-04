@@ -228,7 +228,16 @@
             $sql .= "" . (intval($display_name)) . "" . "";
             $sql .= ")";
 
-            $conn->query($sql);
+            try {
+                $conn->query($sql);
+            } catch (Exception $e) {
+                $err = $e->getMessage();
+                if (strpos($err, "Duplicate entry") === 0) {
+                    return "A user already exists with that email address. <a href='signin.php' class='alert-link'>Please login here</a>.";
+                } else {
+                    return "Something went wrong. Please try again.";
+                }
+            }
 
             $u = new User($uuid);
 
@@ -266,17 +275,29 @@
             if ($this->has_verified()) {
                 return true;
             }
-            $access_token = $client->fetchAccessTokenWithAuthCode($code);
-            $client->setAccessToken($access_token);
 
-            $profile_api = new Google_Service_PeopleService($client);
-            $p = $profile_api->people->get("people/me", array('personFields' => "emailAddresses"));
-            
-            $emails = $p->emailAddresses;
-
+            $emails = [];
             $hasEmail = false;
             $emailVerifiedG = false;
             $g_uid = null;
+            try {
+                $access_token = $client->fetchAccessTokenWithAuthCode($code);
+                $client->setAccessToken($access_token);
+
+                $profile_api = new Google_Service_PeopleService($client);
+                $p = $profile_api->people->get("people/me", array('personFields' => "emailAddresses"));
+                
+                $emails = $p->emailAddresses;
+
+            } catch (Exception $e) {
+                $err = $e->getMessage();
+                if ($err == "Invalid token format") {
+                    header("Location: verify.php");
+                } else {
+                    echo "Something went wrong. Please try again";
+                }
+                die();
+            }
 
             // iterate through all emails, make sure at least one email is the user's email
             foreach ($emails as $email) {
@@ -302,7 +323,17 @@
                 global $conn;
                 $sql = "UPDATE `users` SET `google_user_id`='" . $conn->real_escape_string($g_uid) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
 
-                $conn->query($sql);
+                try {
+                    $conn->query($sql);
+                } catch (Exception $e) {
+                    $err = $e->getMessage();
+                    if (strpos($err, "Duplicate entry") === 0) {
+                        echo "This Google account is already used on another account.";
+                    } else {
+                        echo "Something went wrong. Please try again.";
+                    }
+                    die();
+                }
 
                 header("Location: verify.php?success");
             }

@@ -17,7 +17,6 @@
             </p>
             <br />
             <?php if ($error) { ?>
-                <br />
                 <div class="alert alert-danger" style="margin-right: 15px;"><?php echo $error; ?></div>
             <?php } ?>
             <br />
