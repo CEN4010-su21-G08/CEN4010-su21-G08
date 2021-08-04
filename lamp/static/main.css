@@ -392,3 +392,8 @@ form.sign-in-form, form.sign-up-form {
 .form_required::before {
     content: " *";
 }
+
+form.burrow-form {
+    margin-left: auto;
+    margin-right: auto;
+}
