@@ -86,7 +86,7 @@
                     if (in_array('uid', $cols)) { $this->uid = $user['uid']; }
                     if (in_array('first_name', $cols)) { $this->first_name = $user['first_name']; }
                     if (in_array('last_name', $cols)) { $this->last_name = $user['last_name']; }
-                    if (in_array('display_name', $cols)) { $this->display_name = $user['display_name']; }
+                    if (in_array('display_name', $cols)) { $this->display_name = intval($user['display_name']); }
                     if (in_array('email', $cols)) { $this->email = $user['email']; }
                     if (in_array('google_user_id', $cols)) { $this->google_user_id = $user['google_user_id']; }
                     if (in_array('created_at', $cols)) { $this->created_at = $user['created_at']; }
@@ -369,16 +369,16 @@
                 $conn->query($sql);
             }
         }
-        public function change_displayname($display_name)
+        public function change_display_name($display_name)
         {
             global $conn;
-            if ($display_name != $this->display_name && is_integer($display_name) && !ctype_digit($display_name)){
+            if (isset($display_name) && intval($display_name) != $this->display_name && $display_name != null && is_integer(intval($display_name))) {
                 $display_name = intval($display_name);
                 $sql = "UPDATE `users` SET `display_name` = $display_name WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $conn->query($sql);
             } else {
                 //do nothing
             }
-            $conn->query($sql);
         }
         
         private static function validate_password($password)
