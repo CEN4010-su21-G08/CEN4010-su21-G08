@@ -383,3 +383,12 @@ form.sign-in-form, form.sign-up-form {
     height: 200px;
     z-index: 200;
 }
+
+.form_required {
+    color:#EB4444;
+    
+}
+
+.form_required::before {
+    content: " *";
+}
