@@ -386,7 +386,6 @@ form.sign-in-form, form.sign-up-form {
 
 .form_required {
     color:#EB4444;
-    
 }
 
 .form_required::before {
@@ -404,4 +403,14 @@ form.burrow-form {
 
 .all-course-list .list-group-item span {
     margin-left: auto;
+}
+
+.channels_main .row {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.manage-course {
+    width: 100%;
+    min-width: 40vw;
 }
