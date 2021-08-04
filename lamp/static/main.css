@@ -392,3 +392,11 @@ form.sign-in-form, form.sign-up-form {
 .form_required::before {
     content: " *";
 }
+
+.all-course-list .list-group-item a {
+    text-decoration: none;
+}
+
+.all-course-list .list-group-item span{
+    margin-left: auto;
+}
