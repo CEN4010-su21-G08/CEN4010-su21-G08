@@ -27,13 +27,62 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 echo ("Missing display name");
                 die();
             }
-            $new_display_name = $_POST['display_name'];
-            $user->change_display_name($new_display_name);
+            $result = $user->change_display_name($_POST['display_name']);
+            if ($result != null)
+            {
+                echo $result;
+                die();
+            }
             header("Location: account.php?changed=display_name");
         } else if ($action == 'change_password') {
             // change password
+            if (!isset($_POST['current_password']))
+            {
+                //invalid
+                die();
+            }
+            if (!isset($_POST['new_password']))
+            {
+                //invalid
+                die();
+            }
+            if (!isset($_POST['confirm_new_password']))
+            {
+                //invalid
+                die();
+            }
+            $result = $user->change_password($_POST['current_password'],$_POST['new_password'],$_POST['confirm_new_password']);
+            if ($result != null){
+                echo $result;
+                die();
+            }
+            header("Location: account.php?changed=password");
         } else if ($action == 'change_name') {
             // change name
+            if (!isset($_POST['first_name']))
+            {
+                echo "Missing first name";
+                die();
+            }
+            if (!isset($_POST['last_name']))
+            {
+                echo "Missing last name";
+                die();
+            }
+            $result1 = $user->change_first($_POST['first_name']);
+            $result2 = $user->change_last($_POST['last_name']);
+
+            if ($result1 != null)
+            {
+                echo $result1;
+                die();
+            }
+            if ($result2 != null)
+            {
+                echo $result2;
+                die();
+            }
+            header("Location: account.php?changed=name");
         } else {
             echo 'Invalid action';
             die();
@@ -74,6 +123,23 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         <input type="number" name="display_name" />
     </form>
     <hr />
+    <form method="post" action="account.php?action=change_password">
+        <label>Current Password</label>
+        <input type="password" name="current_password" />
+        <label>New Password</label>
+        <input type="password" name="new_password" />
+        <label>Confirm New Password</label>
+        <input type="password" name="confirm_new_password" />
+        <button type="submit">Submit</button>
+    </form>
+    <hr />
+    <form method="post" action="account.php?action=change_name">
+        <label>First Name</label>
+        <input type="text" name="first_name" />
+        <label>Last Name</label>
+        <input type="text" name="last_name" />
+        <button type="submit">Submit</button>
+    </form>
 
     <script>
         let search = new URLSearchParams(window.location.search);
