@@ -26,8 +26,8 @@ function get_display_name($first_name, $last_name, $display_option) {
 
 function get_display_name_options() {
     return [
-        [0, "First Last"],
-        [1, "First L."],
+        [1, "First Last"],
+        [2, "First L."],
     ];
 }
 
