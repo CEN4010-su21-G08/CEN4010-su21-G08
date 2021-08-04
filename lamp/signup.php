@@ -54,8 +54,10 @@
                         }
                     ?>
                         <option selected>Please choose a display name option</option>
-                        <option <?= $selected_dn == "1" ? "selected ": ""; ?>value="1">First Last</option>
-                        <option <?= $selected_dn == "2" ? "selected ": ""; ?>value="2">Last First</option>
+                        <?php foreach(get_display_name_options() as $display_name_option) { 
+                            $display_name_option[0] = strval($display_name_option[0]); ?>
+                            <option <?= $selected_dn == $display_name_option[0] ? "selected " : ""; ?>value="<?= $display_name_option[0]; ?>"><?= $display_name_option[1]; ?></option>
+                        <?php } ?>
                     </select>
                 </div>
                 <div class="d-grid">

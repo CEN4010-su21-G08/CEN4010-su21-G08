@@ -22,6 +22,13 @@ function get_display_name($first_name, $last_name, $display_option) {
     }
 }
 
+function get_display_name_options() {
+    return [
+        [0, "First Last"],
+        [1, "First L."],
+    ];
+}
+
 
 function get_channel_type($channel_id) {
     global $conn;
