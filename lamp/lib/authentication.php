@@ -377,7 +377,7 @@
                 $sql = "UPDATE `users` SET `display_name` = $display_name WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
                 $conn->query($sql);
             } else {
-                //do nothing
+                return "Issue updating display name";
             }
         }
         
@@ -421,42 +421,47 @@
             if ($old == $new) {
                 return "New password must be different than old password.";
             }
-            if ($new == $new_conf) {
+            if ($new != $new_conf) {
                 return "Verified Password does not match.";
             }
 
             if (!User::validate_password($new)) {
                 return "Please enter a valid password.";
             }else {
-                $sql = "UPDATE `users` SET `password` = '" . $conn->real_escape_string($new) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $h_s_pass = password_hash($new, PASSWORD_DEFAULT);
+                $sql = "UPDATE `users` SET `password` = '" . $conn->real_escape_string($h_s_pass) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
             }
             $conn->query($sql);
+            return null;
         }
 
         public function change_first($new_first) {
             global $conn;
-
-            if (!isset($new_first) || $new_first = null || !is_string($new_first) || empty($new_first)) {
+            $new_first = strval($new_first);
+            if (!User::validate_string($new_first))
+            {
                 return "Please enter a first name";
             }
             if ($new_first != $this->first_name) {
                 $sql = "UPDATE `users` SET `first_name` = '" . $conn->real_escape_string($new_first) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $conn->query($sql);
             }
-
-            $conn->query($sql);
+            return null;
         }
 
         public function change_last($new_last) {
             global $conn;
+            $new_last = strval($new_last);
 
-            if (!isset($new_last) || $new_last = null || !is_string($new_last) || empty($new_last)) {
-                return "Please enter a last name";
+            if (!User::validate_string($new_last))
+            {
+                return "Please enter a Last Name";
             }
             if ($new_last != $this->last_name) {
                 $sql = "UPDATE `users` SET `last_name` = '" . $conn->real_escape_string($new_last) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $conn->query($sql);
             }
-
-            $conn->query($sql);
+            return null;
         }
     }
 
