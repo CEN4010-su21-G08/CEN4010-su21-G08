@@ -414,3 +414,7 @@ form.burrow-form {
     width: 100%;
     min-width: 40vw;
 }
+
+.class-member-list label {
+    text-align: left;
+}
