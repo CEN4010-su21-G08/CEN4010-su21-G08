@@ -308,20 +308,20 @@
             }
         } 
 
-        public static function deactivate_account($uid)
+        public function deactivate_account()
         {
             global $conn;
             // turn off the "active" bit in the user's flags
-            $sql = "UPDATE `users` SET `flags` = `flags` & ~(1 << 0) WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+            $sql = "UPDATE `users` SET `flags` = `flags` & ~(1 << 0) WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
 
             $conn->query($sql);
         }
 
-        public static function delete_account($uid)
+        public function delete_account()
         {
             global $conn;
 
-            $sql = "DELETE FROM `users` WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+            $sql = "DELETE FROM `users` WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
 
             $conn->query($sql);
         }
