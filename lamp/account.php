@@ -28,69 +28,61 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 die();
             }
             $result = $user->change_display_name($_POST['display_name']);
-            if ($result != null)
-            {
+            if ($result != null) {
                 echo $result;
                 die();
             }
             header("Location: account.php?changed=display_name");
         } else if ($action == 'change_password') {
             // change password
-            if (!isset($_POST['current_password']))
-            {
+            if (!isset($_POST['current_password'])) {
                 //invalid
                 die();
             }
-            if (!isset($_POST['new_password']))
-            {
+            if (!isset($_POST['new_password'])) {
                 //invalid
                 die();
             }
-            if (!isset($_POST['confirm_new_password']))
-            {
+            if (!isset($_POST['confirm_new_password'])) {
                 //invalid
                 die();
             }
-            $result = $user->change_password($_POST['current_password'],$_POST['new_password'],$_POST['confirm_new_password']);
-            if ($result != null){
+            $result = $user->change_password($_POST['current_password'], $_POST['new_password'], $_POST['confirm_new_password']);
+            if ($result != null) {
                 echo $result;
                 die();
             }
             header("Location: account.php?changed=password");
         } else if ($action == 'change_name') {
             // change name
-            if (!isset($_POST['first_name']))
-            {
+            if (!isset($_POST['first_name'])) {
                 echo "Missing first name";
                 die();
             }
-            if (!isset($_POST['last_name']))
-            {
+            if (!isset($_POST['last_name'])) {
                 echo "Missing last name";
                 die();
             }
             $result1 = $user->change_first($_POST['first_name']);
             $result2 = $user->change_last($_POST['last_name']);
 
-            if ($result1 != null)
-            {
+            if ($result1 != null) {
                 echo $result1;
                 die();
             }
-            if ($result2 != null)
-            {
+            if ($result2 != null) {
                 echo $result2;
                 die();
             }
             header("Location: account.php?changed=name");
-        } else {
+        } else if ($action = 'deactivate_account') {
+            $user->deactivate_account();
+            header("Location: account.php?changed=deactivated");
+        }  else {
             echo 'Invalid action';
             die();
         }
     }
-    echo "Invalid action";
-    die();
-    //
 } else if ($_SERVER['REQUEST_METHOD'] == "DELETE") {
     // delete account
 } else if ($_SERVER['REQUEST_METHOD'] == "GET") {
@@ -140,6 +132,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         <input type="text" name="last_name" />
         <button type="submit">Submit</button>
     </form>
+    <hr />
+    <form method="post" action="account.php?action=deactivate_account">
+        <button type="submit">Disable</button>
+    </form>
+    <hr />
 
     <script>
         let search = new URLSearchParams(window.location.search);
