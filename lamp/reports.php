@@ -95,6 +95,44 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $response['success'] = true;
             sendResponse();
         } else if ($action == "act") {
+            if (!isset($_GET['act']) || empty($_GET['act'])) {
+                sendError("Invalid action provided", 400);
+            }
+            if (!isset($_GET['r_id']) || empty($_GET['r_id'])) {
+                sendError("Invalid report specified", 400);
+            }
+            $r_id = $_GET['r_id'];
+            $report = new Report($r_id);
+            if ($report->r_id == null) {
+                sendError("Unknown report specified", 404);
+            }
+            $r_id = $_GET['r_id'];
+            $report = new Report($r_id);
+            $courseM = new CourseMembership($user->uid, $report->course_id);
+
+
+            if (!$user->is_admin() && ($courseM->role != 2)) {
+                sendError("Forbidden", 403);
+            }
+
+            $act = $_GET['act'];
+            if ($act == 'ignore') {
+                $report->ignore();
+            }
+            if ($act == "delete") {
+                $report->deleteMessage();
+            }
+            if ($act == "mute") {
+                $report->muteUser();
+            }
+            if ($act == "remove") {
+                $report->kickUser();
+            }
+            if ($act == "ban") {
+                $report->banUser();
+            }
+            $response['success'] = true;
+            sendResponse();
         } else {
             sendError("Invalid action provided", 400);
         }
@@ -103,17 +141,11 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
 } else if ($_SERVER['REQUEST_METHOD'] == "GET") {
     include('common/header.php');
-    if (!isset($_GET['action']) || $_GET['action'] == 'list') {
+    if (!isset($_GET['r_id'])) {
         // List reports
         include('pages/report-list.php');
     } else {
-        $action = $_GET['action'];
-        if ($action == "get") {
-        } else { ?>
-            <div class="alert alert-danger">
-                Invalid action
-            </div>
-<?php }
+        include('pages/report-get.php');
     }
     include('common/footer.php');
 } else {
