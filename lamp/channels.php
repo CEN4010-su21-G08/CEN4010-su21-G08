@@ -52,6 +52,10 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 <?php
                 if ($is_instructor) { ?>
                     <h2>INSTRUCTOR VIEW</h2>
+                    <?php
+                    if ($channel->type == 2) { ?>
+                        <a href="manage-group.php?ch_id=<?=$channel->ch_id?>">Manage Group</a>
+                    <?php } ?>
                 <?php } ?>
                 <div class="older">
                     <button id="older-btn" class="btn btn-outline-secondary" onclick="getOlderMessages();">Load earlier messages</button>

@@ -89,6 +89,23 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
 
 <?php include('./common/footer.php');
     }
-} else {
-    
-} ?>
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST") { 
+    if (isset($_POST['mod_group_name']))
+    {
+        $new_name = $_POST['mod_group_name'];
+        $group->change_name($new_name);
+        echo($new_name);
+    }
+
+    $users_in_course = CourseMembership::get_users_in_course($group->course_id);
+    foreach ($users_in_course as $user)
+    {
+        if (isset($_POST[$user->uid]))
+        {
+            GroupMembership::create_membership($user->uid, $group->ch_id);
+        }
+    }
+
+    header("Location: manage-group.php?ch_id=" . urlencode($ch_id));
+ } ?>

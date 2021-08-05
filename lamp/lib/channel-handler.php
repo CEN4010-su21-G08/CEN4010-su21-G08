@@ -193,6 +193,20 @@
                 return $membership->role;
             }
         }
+
+        public function change_name($name)
+        {
+            if (!isset($name))
+            {
+                throwError(500, "name cannot be updated because a new name has not been passed.");
+            }
+            
+            global $conn;
+
+            $sql = "UPDATE `channels` SET `name` = '" . $conn->real_escape_string($name) . "' WHERE `ch_id` = '" . $conn->real_escape_string($this->ch_id) . "'";
+
+            $conn->query($sql);
+        }
     }
 
 class GroupMembership
