@@ -32,7 +32,7 @@ global $center_page;
                   </a>
                   <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="mainNavbarMyAccount">
                     <li><span class="dropdown-item" href="#"><?php echo htmlspecialchars($_SESSION['email']); ?></a></li>
-                    <li><a class="dropdown-item" href="#">Account Settings</a></li>
+                    <li><a class="dropdown-item" href="account.php">Account Settings</a></li>
                     <li><a class="dropdown-item" href="signout.php">Sign out</a></li>
                   </ul>
                 </li>

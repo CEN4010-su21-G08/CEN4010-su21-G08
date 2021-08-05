@@ -405,7 +405,7 @@ form.burrow-form {
     margin-left: auto;
 }
 
-.channels_main .row {
+.channels_main .row, .account_page .row {
     margin-left: 0px;
     margin-right: 0px;
 }
