@@ -1,4 +1,8 @@
 <?php
+require_once("lib/authentication.php");
+require_once("lib/channel-handler.php");
+require_once("lib/Channel-handler.php");
+
 class Punishment
 {
     public $p_id = null;
@@ -20,11 +24,11 @@ class Punishment
     {
         global $conn;
 
-        if ($p_id - null)
+        if ($p_id == null)
         {
             // do nothing
         }
-        else if ($r_id = null)
+        else if ($r_id == null)
         {
             $sql = "SELECT * FROM `punishments` WHERE `p_id` = '" . $conn->real_escape_string($p_id) . "'";
             $result = $conn->query($sql);
@@ -65,11 +69,11 @@ class Punishment
         $p_id = generateRandomString();
 
         //insert into columns provided in function parameters
-        $sql = "INSERT INTO `punishment` (`p_id`, ";
+        $sql = "INSERT INTO `punishments` (`p_id`, ";
         if (isset($r_id)) $sql .= "`r_id`, ";
         $sql .= "`uid`, ";
         if (isset($ch_id)) $sql .= "`ch_id`, ";
-        if (isset($expires_at)) $sql .= "`expires_at`, ";
+        if (isset($expires_at) && $expires_at != null) $sql .= "`expires_at`, ";
         if (isset($reason)) $sql .= "`reason`, ";
         $sql .= "`type`";
         if (isset($course_id)) $sql .= ", `course_id`";
@@ -81,7 +85,7 @@ class Punishment
         if (isset($r_id)) $sql .= "'" . $conn->real_escape_string($r_id) . "', ";
         $sql .= "'" . $conn->real_escape_string($uid) . "', ";
         if (isset($ch_id)) $sql .= "'" . $conn->real_escape_string($ch_id) . "', ";
-        if (isset($expires_at)) $sql .= "'" . $conn->real_escape_string($expires_at) . "', ";
+        if (isset($expires_at) && $expires_at != null) $sql .= "'" . $conn->real_escape_string($expires_at) . "', ";
         if (isset($reason)) $sql .= "'" . $conn->real_escape_string($reason) . "', ";
         $sql .= "'" . $conn->real_escape_string($type) . "'";
         if (isset($course_id)) $sql .= ", '" . $conn->real_escape_string($course_id) . "'";
@@ -103,7 +107,8 @@ class Punishment
 
     public static function ban_user_account($uid, $r_id = null, $reason = null, $expires_at = null)
     {
-        User::deactivate_account($uid);
+        $u = new User($uid);
+        $u->deactivate_account();
         Punishment::create($uid, 1, null, null, $r_id, $reason, $expires_at);
     }
 
@@ -308,9 +313,9 @@ class Punishment
 
         $out = array();
 
-        if (isset($ype))
+        if (isset($type))
         {
-            $sql = "SELECT * FROM `punishments` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `type` = '" . $conn->real_escape_string($ype) . "'";
+            $sql = "SELECT * FROM `punishments` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `type` = '" . $conn->real_escape_string($type) . "'";
 
             $result = $conn->query($sql);
 
@@ -356,6 +361,12 @@ class Punishment
 
     public static function is_expired($expires_at)
     {
-        return false;
+        $expire_timestamp = strtotime($expires_at);
+
+        $current_time = time();
+
+        $is_expired = $current_time > $expire_timestamp;
+
+        return $is_expired;
     }
 };

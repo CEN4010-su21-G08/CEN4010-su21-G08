@@ -13,6 +13,12 @@
         $is_logged_in = true;
         $user = new User($_SESSION['user_id']);
     }
+    if ($user != null && !$user->is_active()) {
+        $is_logged_in = false;
+        $user = null;
+        session_destroy();
+        session_start();
+    }
 
     if (isset($auth_needed) && ($auth_needed == false)) {
         
@@ -34,8 +40,3 @@
 
     $sidebar_shown = false;
     require_once('common/sidebar.php');
-    $member_sidebar_shown = false;
-    require_once('common/member_sidebar.php');
-
-    
-

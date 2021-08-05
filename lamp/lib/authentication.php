@@ -30,6 +30,10 @@
     $client->addScope("profile");
     $client->setAccessType("offline"); 
     
+    /* Define User flag constants */
+    // (note: defines shift)
+    define("USER_ACTIVE", 0);
+    define("USER_ADMIN", 1);
 
     class User {
         public $uid = null;
@@ -41,9 +45,10 @@
         public $created_at = null;
         private $mfa_code = null;
         private $password = null;
+        public $flags = null;
 
         /* $cols should not be user-provided input */
-        function __construct($uid=null, $email=null, $cols=["uid", "email", "first_name", "last_name", "display_name", "google_user_id"]) {
+        function __construct($uid = null, $email = null, $cols = ["uid", "email", "first_name", "last_name", "display_name", "flags", "google_user_id"]) {
             global $conn;
             if ($uid == null && $email == null) {
                 // do nothing
@@ -81,12 +86,13 @@
                     if (in_array('uid', $cols)) { $this->uid = $user['uid']; }
                     if (in_array('first_name', $cols)) { $this->first_name = $user['first_name']; }
                     if (in_array('last_name', $cols)) { $this->last_name = $user['last_name']; }
-                    if (in_array('display_name', $cols)) { $this->display_name = $user['display_name']; }
+                    if (in_array('display_name', $cols)) { $this->display_name = intval($user['display_name']); }
                     if (in_array('email', $cols)) { $this->email = $user['email']; }
                     if (in_array('google_user_id', $cols)) { $this->google_user_id = $user['google_user_id']; }
                     if (in_array('created_at', $cols)) { $this->created_at = $user['created_at']; }
                     if (in_array('mfa_code', $cols)) { $this->mfa_code = $user['mfa_code']; }
                     if (in_array('password', $cols)) { $this->password = $user['password']; }
+                    if (in_array('flags', $cols)) { $this->flags = $user['flags']; }
                 }   
             }
         }
@@ -94,9 +100,14 @@
         public static function sign_in($email_address, $password) {
             global $conn;
             
-            $u = new User(null, $email_address, ["uid", "password", "email", "first_name", "last_name", "display_name"]);
+            $u = new User(null, $email_address, ["uid", "password", "email", "first_name", "last_name", "flags", "display_name"]);
             if ($u->uid != null) {
                 if (password_verify($password, $u->password)) {
+                    // check if not active
+                    if (!$u->get_flag(USER_ACTIVE)) {
+                        // todo: possibly include more specific error
+                        return new User();
+                    }
                     $u->password = null;
                     $u->set_user_session();
                     return $u;
@@ -111,7 +122,13 @@
         private function set_user_session() {
             if ($this->uid != null) {
                 global $conn;
-                $sql = "SELECT `email`, `uid`, `first_name`, `last_name`, `display_name` FROM `users` WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $sql = "SELECT `email`, `uid`, `first_name`, `last_name`, `display_name`, `flags` FROM `users` WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+
+                if (!$this->get_flag(USER_ACTIVE)) {
+                    return;
+                    session_destroy();
+                    session_start();
+                }
                 // $statement = $conn->prepare($sql);
                 // $statement->bind_param("s", $user_uid)
                 $result = $conn->query($sql);
@@ -163,20 +180,20 @@
                 display name: any number (invalid values are already handled properly when used)
             */
             
-            if (!isset($first_name) || $first_name == null || !is_string($first_name) || strlen($first_name) <= 0 || empty($first_name)) {
+            if (!User::validate_string($first_name)) {
                 return "Your first name is required.";
             }
-            if (!isset($last_name) || $last_name == null || !is_string($last_name) || strlen($last_name) <= 0 || empty($last_name)) {
+            if (!User::validate_string($last_name)) {
                 return "Your last name is required.";
             }
-            if (!isset($email) || $email == null || !is_string($email) || strlen($email) <= 0 || empty($email)) {
+            if (!User::validate_string($email)) {
                 return "Your email address is required.";
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return "Your email address is invalid.";
             }
             
-            if (!isset($password) || $password == null || !is_string($password) || empty($password)) {
+            if (!User::validate_string($password)) {
                 return "Your password is required.";
             }
 
@@ -188,23 +205,9 @@
                 return "Passwords do not match";
             }
 
-            if (strlen($password) < 8) {
-                return "Your password must be at least 8 characters long.";
-            }
-            
-            $one_upper = preg_match("/[A-Z]/", $password);
-            $one_lower = preg_match("/[a-z]/", $password);
-            $one_number = preg_match("/[0-9]/", $password);
-            $one_symbol = preg_match("/\W/", $password);
-
-            $cnt = 0;
-            if ($one_upper) { $cnt++; }; 
-            if ($one_lower) { $cnt++; }; 
-            if ($one_number) { $cnt++; }; 
-            if ($one_symbol) { $cnt++; }; 
-
-            if ($cnt < 3) {
-                return "Your password must contain at least three of the following: (a) one number, (b) one lowercase letter, (c) one uppercase letter, (d) one symbol. Please choose a strong password";
+            if (!User::validate_password($password))
+            {
+                return "Your password must be at least 8 characters long and must contain at least three of the following: (a) one number, (b) one lowercase letter, (c) one uppercase letter, (d) one symbol.";
             }
 
 
@@ -222,10 +225,19 @@
             $sql .= "'" . $conn->real_escape_string($last_name) . "'" . ", ";
             $sql .= "'" . $conn->real_escape_string($email) . "'" . ", ";
             $sql .= "'" . $conn->real_escape_string($h_s_pass) . "'" . ", ";
-            $sql .= "" . $conn->real_escape_string($display_name) . "" . "";
+            $sql .= "" . (intval($display_name)) . "" . "";
             $sql .= ")";
 
-            $conn->query($sql);
+            try {
+                $conn->query($sql);
+            } catch (Exception $e) {
+                $err = $e->getMessage();
+                if (strpos($err, "Duplicate entry") === 0) {
+                    return "A user already exists with that email address. <a href='signin.php' class='alert-link'>Please login here</a>.";
+                } else {
+                    return "Something went wrong. Please try again.";
+                }
+            }
 
             $u = new User($uuid);
 
@@ -263,17 +275,29 @@
             if ($this->has_verified()) {
                 return true;
             }
-            $access_token = $client->fetchAccessTokenWithAuthCode($code);
-            $client->setAccessToken($access_token);
 
-            $profile_api = new Google_Service_PeopleService($client);
-            $p = $profile_api->people->get("people/me", array('personFields' => "emailAddresses"));
-            
-            $emails = $p->emailAddresses;
-
+            $emails = [];
             $hasEmail = false;
             $emailVerifiedG = false;
             $g_uid = null;
+            try {
+                $access_token = $client->fetchAccessTokenWithAuthCode($code);
+                $client->setAccessToken($access_token);
+
+                $profile_api = new Google_Service_PeopleService($client);
+                $p = $profile_api->people->get("people/me", array('personFields' => "emailAddresses"));
+                
+                $emails = $p->emailAddresses;
+
+            } catch (Exception $e) {
+                $err = $e->getMessage();
+                if ($err == "Invalid token format") {
+                    header("Location: verify.php");
+                } else {
+                    echo "Something went wrong. Please try again";
+                }
+                die();
+            }
 
             // iterate through all emails, make sure at least one email is the user's email
             foreach ($emails as $email) {
@@ -299,28 +323,176 @@
                 global $conn;
                 $sql = "UPDATE `users` SET `google_user_id`='" . $conn->real_escape_string($g_uid) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
 
-                $conn->query($sql);
+                try {
+                    $conn->query($sql);
+                } catch (Exception $e) {
+                    $err = $e->getMessage();
+                    if (strpos($err, "Duplicate entry") === 0) {
+                        echo "This Google account is already used on another account.";
+                    } else {
+                        echo "Something went wrong. Please try again.";
+                    }
+                    die();
+                }
 
                 header("Location: verify.php?success");
             }
         } 
 
-        public static function deactivate_account($uid)
+        public function deactivate_account()
         {
             global $conn;
-
-            $sql = "UPDATE `users` SET `active` = '0' WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+            // turn off the "active" bit in the user's flags
+            $sql = "UPDATE `users` SET `flags` = `flags` & ~(1 << 0) WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
 
             $conn->query($sql);
         }
 
-        public static function delete_account($uid)
+        public function delete_account()
         {
             global $conn;
 
-            $sql = "DELETE FROM `users` WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
+            $sql = "DELETE FROM `users` WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
 
             $conn->query($sql);
+        }
+
+        // sets the value of the admin flag based on the provided new value
+        public function set_admin($newValue)
+        {
+            $this->update_flag(USER_ADMIN, $newValue);
+        }
+
+        // returns true if the user is an admin
+        public function is_admin() 
+        {
+            return $this->get_flag(USER_ADMIN);
+        }
+        
+        // returns true if the user is active
+        public function is_active() 
+        {
+            return $this->get_flag(USER_ACTIVE);
+        }
+
+        // sets the value of the active flag based on the provided new value
+        public function set_active($newValue)
+        {
+            $this->update_flag(USER_ACTIVE, $newValue);
+        }
+
+        // returns the value of a user's flag
+        private function get_flag($shiftAmt) 
+        {
+            return $this->flags & (1 << $shiftAmt);
+        }
+
+        // updates the value of a user's flag
+        private function update_flag($shiftAmt, $enabled)
+        {
+            global $conn;
+            if (ctype_digit($shiftAmt)) {
+                if ($enabled) {
+                    $sql = "UPDATE `users` SET `flags` = `flags` & ~(1 << " . intval($shiftAmt) . ") WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                } else {
+                    $sql = "UPDATE `users` SET `flags` = `flags` | (1 << " . intval($shiftAmt) . ") WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                }
+                $conn->query($sql);
+            }
+        }
+        public function change_display_name($display_name)
+        {
+            global $conn;
+            if (isset($display_name) && intval($display_name) != $this->display_name && $display_name != null && is_integer(intval($display_name))) {
+                $display_name = intval($display_name);
+                $sql = "UPDATE `users` SET `display_name` = $display_name WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $conn->query($sql);
+            } else {
+                return "Issue updating display name";
+            }
+        }
+        
+        private static function validate_password($password)
+        {
+            $one_upper = preg_match("/[A-Z]/", $password);
+            $one_lower = preg_match("/[a-z]/", $password);
+            $one_number = preg_match("/[0-9]/", $password);
+            $one_symbol = preg_match("/\W/", $password);
+
+            $cnt = 0;
+            if ($one_upper) $cnt++; 
+            if ($one_lower) $cnt++; 
+            if ($one_number) $cnt++; 
+            if ($one_symbol) $cnt++;
+
+            if (strlen($password) >= 8 && $cnt >= 3) return true;
+            else return false;
+        }
+
+        private static function validate_string($s)
+        {
+            if (!isset($s) || $s == null || !is_string($s) || empty($s)) {
+                return false;
+            }
+            return true;
+        }
+
+        public function change_password($old, $new, $new_conf) {
+            global $conn;
+
+            if (!User::validate_string($new)) {
+                return "New password is required.";
+            }
+            if (!User::validate_string($old)) {
+                return "Old password is required.";
+            }
+            if (!password_verify($old, $this->password)) {
+                return "Old password is incorrect.";
+            }
+            if ($old == $new) {
+                return "New password must be different than old password.";
+            }
+            if ($new != $new_conf) {
+                return "Verified Password does not match.";
+            }
+
+            if (!User::validate_password($new)) {
+                return "Please enter a valid password.";
+            }else {
+                $h_s_pass = password_hash($new, PASSWORD_DEFAULT);
+                $sql = "UPDATE `users` SET `password` = '" . $conn->real_escape_string($h_s_pass) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+            }
+            $conn->query($sql);
+            return null;
+        }
+
+        public function change_first($new_first) {
+            global $conn;
+            $new_first = strval($new_first);
+            if (!User::validate_string($new_first))
+            {
+                return "Please enter a first name";
+            }
+            if ($new_first != $this->first_name) {
+                $sql = "UPDATE `users` SET `first_name` = '" . $conn->real_escape_string($new_first) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $conn->query($sql);
+            }
+            return null;
+        }
+
+        public function change_last($new_last) {
+            global $conn;
+            $new_last = strval($new_last);
+
+            if (!User::validate_string($new_last))
+            {
+                return "Please enter a Last Name";
+            }
+            if ($new_last != $this->last_name) {
+                $sql = "UPDATE `users` SET `last_name` = '" . $conn->real_escape_string($new_last) . "' WHERE `uid` = '" . $conn->real_escape_string($this->uid) . "'";
+                $conn->query($sql);
+            }
+            return null;
         }
     }
 
@@ -388,9 +560,15 @@
     function is_user_instructor($course_id)
     {
         include_once("lib/course-handler.php");
-        $uid = $_SESSION['uid'];
+        include_once("lib/page-setup.php");
+        global $user;
+        
+        if ($user->is_admin() == true)
+        {
+            return true;
+        }
 
-        $Membership = new CourseMembership($uid, $course_id);
+        $Membership = new CourseMembership($user->uid, $course_id);
         
         if ($Membership->role == 2)
             return true;

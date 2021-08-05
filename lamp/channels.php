@@ -1,7 +1,6 @@
 <?php
 $page_title = "Channels";
 $include_sidebar = true;
-$include_member_sidebar = true;
 ?>
 <?php require_once("lib/page-setup.php"); ?>
 <?php include('lib/message-handler.php'); ?>
@@ -28,12 +27,17 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     if (!$has_access) { ?>
         <div class="alert alert-danger" style="margin: 20px;">You don't have access to this channel or it doesn't exist</div>
     <?php } else {
-        $groups = Channel::get_users_channels_in_course($_SESSION['uid'], $channel->course_id, true);
-        $users = Channel::get_members($channel->ch_id);
+        $groups = Channel::get_users_channels_in_course($user->uid, $channel->course_id, true);
+        if ($channel->type == 2) {
+            $members = Channel::get_members($channel->ch_id);
+        } else {
+            $members = [];
+        }
+
     ?>
-        <?php 
-        show_sidebar("Course", $course->course_code . "-" . $course->section_number, $channel->course_id, $groups, $is_instructor); 
-        show_member_sidebar($channel->type, $is_instructor, $users, $channel_id); ?>
+        <?php
+        show_sidebar("Course", $course->course_code . "-" . $course->section_number, $channel->course_id, $channel->name, $groups, $is_instructor, $members);
+        ?>
         <div class="channels_main">
             <div>
                 <h2>
@@ -48,6 +52,10 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 <?php
                 if ($is_instructor) { ?>
                     <h2>INSTRUCTOR VIEW</h2>
+                    <?php
+                    if ($channel->type == 2) { ?>
+                        <a href="manage-group.php?ch_id=<?=$channel->ch_id?>">Manage Group</a>
+                    <?php } ?>
                 <?php } ?>
                 <div class="older">
                     <button id="older-btn" class="btn btn-outline-secondary" onclick="getOlderMessages();">Load earlier messages</button>
@@ -77,6 +85,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 </form>
             <?php } ?>
 
+            <div class="" style="display: none;" id="context_menu">
+                <a class="list-group-item list-group-item-action context_menu_link" data-action='report' href="#">Report Message</a>
+            </div>
             <script>
                 <?php if (!$announcement || ($announcement && $is_instructor)) { ?>
                     $send_input = $("input[name=message]");
@@ -242,16 +253,161 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                                         $m_el.addClass("announcement-message");
                                     }
                                 }
+
+                                $m_el.attr("data-m_id", m.m_id);
+
                                 $('.messages').append($m_el)
                             })
                             if (messages.length == 0) {
                                 $('.messages').text("No messages found");
                             }
                         }
+                        $('.message').off('contextmenu');
+                        $('.message').on('contextmenu', messageContextMenuHandler);
                         if (typeof done == 'function') {
                             done();
                         }
                     });
+                }
+
+
+                /* Right-click handler */
+                function messageContextMenuHandler(event) {
+                    event.preventDefault();
+
+                    let $m = $(this);
+                    let m_id = $m.attr("data-m_id");
+
+                    $contextMenu = $('#context_menu');
+                    $contextMenu.attr("data-message", m_id);
+                    $contextMenu.css('display', "block");
+                    $contextMenu.css('left', event.pageX + 2)
+                    $contextMenu.css('top', event.pageY + 2)
+                }
+
+                function closeContextMenu() {
+                    $contextMenu = $('#context_menu');
+                    $contextMenu.attr("data-message", "");
+                    $contextMenu.css('display', "none");
+                    $contextMenu.css('left', 0)
+                    $contextMenu.css('top', 0)
+                }
+
+                // If the context menu is open, close it if a click occurs outside the menu
+                $(document.body).click(event => {
+                    $cm = $('#context_menu');
+                    if ($cm.css('display') == 'block' && !$cm[0].contains(event.target)) {
+                        closeContextMenu();
+                    }
+                });
+                // same, but for the context menu. also check that it's not a message
+                $(document.body).contextmenu(event => {
+                    let cT = event.target;
+                    if ($(cT).hasClass("message")) return;
+                    let $cTParent = $(cT).parent(".message");
+                    if ($cTParent.length > 0) return;
+
+                    $cm = $('#context_menu');
+                    if ($cm.css('display') == 'block' && !$cm[0].contains(event.target)) {
+                        closeContextMenu();
+                    }
+                });
+
+                $(".context_menu_link").click(event => {
+                    let $target = $(event.target);
+                    let action = $target.attr('data-action');
+                    let message = $target.parent("#context_menu").attr("data-message");
+                    showReportModal(message);
+                    closeContextMenu();
+                    switch (action) {
+                        case 'report':
+                            console.log("report!")
+                            break;
+                        default:
+                            break;
+                    }
+                });
+                let $modal = null;
+                let bsModal = null;
+
+                function showReportModal(m_id) {
+                    $modal = createModal();
+                    let $modalBody = $($modal[0].querySelector(".modal-body"));
+                    $modalBody.text("Are you sure you want to report?");
+                    let $form = $("<form method='post'><input id='report_reason' placeholder='report reason' type='text' name='reason' /></form>")
+                    $form.on('submit', event => {
+                        event.preventDefault();
+                        $reason = $('#report_reason');
+                        submitReport(m_id, $reason.val());
+                    })
+                    $modalBody.append($form);
+                    let $modalHeader = $($modal[0].querySelector("h5"));
+                    $modalHeader.text("Report Message");
+                    bsModal = new bootstrap.Modal($modal);
+                    bsModal.show();
+
+
+                }
+
+                function submitReport(m_id, reason) {
+                    let urlSearchParams = new URLSearchParams(window.location.search);
+                    let ch_id = urlSearchParams.get("ch_id");
+                    $.post("reports.php?action=create", {
+                        m_id: m_id,
+                        ch_id: ch_id,
+                        reason: reason,
+                    }).then((data, status, xhr) => {
+                        if (status == 'success') {
+                            if (xhr.getResponseHeader("Content-Type") != 'application/json' || !data) {
+                                handleReportError();
+                                return;
+                            }
+                            if (data.error) {
+                                handleReportError(data.error);
+                                return;
+                            }
+                            bsModal.dispose();
+                            $modal.remove();
+
+                            $modal = createModal();
+                            let $modalBody = $($modal[0].querySelector(".modal-body"));
+                            $modalBody.html("<div class='alert alert-success'>Successfully submitted report!</div>");
+                            let $modalHeader = $($modal[0].querySelector("h5"));
+                            $modalHeader.text("Submitted report")
+
+                            let $saveBtn = $($modal[0].querySelector(".btn-primary"));
+                            $saveBtn.remove();
+                            let $closeBtn = $($modal[0].querySelector(".btn-secondary"));
+                            $closeBtn.addClass("btn-primary");
+                            $closeBtn.removeClass("btn-secondary");
+                            bsModal = new bootstrap.Modal($modal);
+                            bsModal.show();
+                        }
+                        console.log(status);
+                    }, (xhr, status, error) => {
+                        if (xhr.responseJSON && xhr.responseJSON.error)
+                            handleReportError(xhr.responseJSON.error);
+                        else {
+                            handleReportError();
+                        }
+
+                    })
+                }
+
+                function handleReportError(error = "An unknown error occurred") {
+                    let $modalBody = $($modal[0].querySelector(".modal-body"));
+                    if ($modalBody[0].querySelector(".alert")) {
+                        $($modalBody[0].querySelector(".alert")).remove();
+                    }
+                    let $alert = $("<div style='padding-top: 10px;' class='alert alert-danger'>Something went wrong: <span></span></div>");
+                    $($alert[0].querySelector("span")).text(error);
+                    $modalBody.append($alert);
+                }
+
+
+                function createModal() {
+                    let $m = $('<div data-bs-backdrop="static" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"></h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Save changes</button></div></div></div></div>');
+                    return $m;
                 }
             </script>
         <?php } ?>

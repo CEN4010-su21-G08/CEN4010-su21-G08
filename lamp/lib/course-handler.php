@@ -67,6 +67,7 @@
 
             
         }
+
         public static function get_user_courses($uid) 
         {
             global $conn;
@@ -234,8 +235,160 @@
             return $results;
         }
 
-        public static function create_course() {}
-        public static function update_course() {}
+        public static function create_course($course_code, $section_number, $instructor_email, $instructor_name = null, $course_description = null, $course_name = null)
+        {
+            require_once("lib/channel-handler.php");
+
+            global $conn;
+
+            if (!isset($course_code) || !isset($section_number) || !isset($instructor_email))
+            {
+                throwError(500, "Proper information not provided; could not create course");
+            }
+
+            $course_id = generateRandomString();
+
+            $sql = "INSERT INTO `courses` (`course_code`, `section_number`, `instructor_email`, `course_id`";
+            if (isset($instructor_name)) $sql .= ", `instructor_name`";
+            if (isset($course_description)) $sql .= ", `course_description`";
+            if (isset($course_name)) $sql .= ", `course_name`";
+
+            $sql .= ") VALUES (";
+
+            $sql .= "'" . $conn->real_escape_string($course_code) . "', ";
+            $sql .= "'" . $conn->real_escape_string($section_number) . "', ";
+            $sql .= "'" . $conn->real_escape_string($instructor_email) . "', ";
+            $sql .= "'" . $conn->real_escape_string($course_id) . "'";
+            if (isset($instructor_name)) $sql .= ", '" . $conn->real_escape_string($instructor_name) . "'";
+            if (isset($course_description)) $sql .= ", '" . $conn->real_escape_string($course_description) . "'";
+            if (isset($course_name)) $sql .= ", '" . $conn->real_escape_string($course_name) . "'";
+
+            $sql .= ")";
+
+            $conn->query($sql);
+
+            Channel::create_channel($course_id, null, 1, $course_id);
+
+            $course = new Course($course_id);
+            
+            return $course;
+        }
+
+        public function update_course($course_code = null, $section_number = null, $instructor_email = null, $instructor_name = null, $course_description = null, $course_name = null)
+        {
+            if (!isset($course_code) && !isset($section_number) && !isset($instructor_email) && !isset($instructor_name) && !isset($course_description) && !isset($course_name))
+            {
+                throwError(500, "No parameters were updated in the course");
+            }
+
+            global $conn;
+
+            $table_updated = false;
+
+            $sql = "UPDATE `courses` SET ";
+            if (isset($course_code)) 
+            {
+                $sql .= "`course_code` = '" . $conn->real_escape_string($course_code) . "'";
+                $table_updated = true;
+                $this->course_code = $course_code;
+                
+            }
+            if (isset($section_number)) 
+            {
+                if ($table_updated) $sql .= ", ";
+                $sql .= "`section_number` = '" . $conn->real_escape_string($section_number) . "'";
+                $table_updated = true;
+                $this->section_number = $section_number;
+            }
+            if (isset($instructor_email)) 
+            {
+                if ($table_updated) $sql .= ", ";
+                $sql .= "`instructor_email` = '" . $conn->real_escape_string($instructor_email) . "'";
+                $table_updated = true;
+                $this->instructor_email = $instructor_email;
+            }
+            if (isset($instructor_name)) 
+            {
+                if ($table_updated) $sql .= ", ";
+                $sql .= "`instructor_name` = '" . $conn->real_escape_string($instructor_name) . "'";
+                $table_updated = true;
+                $this->instructor_name= $instructor_name;
+            }
+            if (isset($course_description)) 
+            {
+                if ($table_updated) $sql .= ", ";
+                $sql .= "`course_description` = '" . $conn->real_escape_string($course_description) . "'";
+                $table_updated = true;
+                $this->course_description = $course_description;
+            }
+            if (isset($course_name)) 
+            {
+                if ($table_updated) $sql .= ", ";
+                $sql .= "`course_name` = '" . $conn->real_escape_string($course_name) . "'";
+                $this->course_name = $course_name;
+            }
+
+            $sql .= " WHERE `course_id` = '" . $conn->real_escape_string($this->course_id) . "'";
+
+            $conn->query($sql);
+        }
+
+        public function delete_course()
+        {
+            if (!(isset($this->course_id)))
+                throwError(500, "This course does not exist, cannot be deleted");
+            else
+            {
+                require_once("channel-handler.php");
+
+                global $conn; 
+
+                $channels = Channel::get_course_channels($this->course_id);
+
+                $sql = "DELETE FROM `courses` WHERE `course_id` = '" . $conn->real_escape_string($this->course_id) . "'";
+
+                $conn->query($sql);
+
+                $sql = "DELETE FROM `course_membership` WHERE `course_id` = '" . $conn->real_escape_string($this->course_id). "'";
+
+                foreach ($channels as $channel)
+                {
+                    $channel->delete_channel();
+                }
+            }
+        }
+
+        public static function get_all_courses()
+        {
+            global $conn;
+
+            $sql = "SELECT * FROM `courses`";
+
+            $result = $conn->query($sql);
+
+            $numRows = mysqli_num_rows($result);
+            if ($numRows <= 0) {
+                return array();
+            }
+            else
+            {
+                $out = array();
+                while ($row = $result->fetch_assoc())
+                {
+                    $course = new Course();
+                    $course->course_code = $row['course_code'];
+                    $course->section_number = $row['section_number'];
+                    $course->instructor_email = $row['instructor_email'];
+                    $course->course_id = $row['course_id'];
+                    if (isset($row['instructor_name'])) $course->instructor_name = $row['instructor_name'];
+                    if (isset($row['course_description'])) $course->course_description = $row['course_description'];
+                    if (isset($row['course_name'])) $course->course_name = $row['course_name'];
+                    $out[] = $course;
+                }
+                return $out;
+            }
+        }
+
     };
 
     class CourseSearchResult {

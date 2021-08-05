@@ -68,7 +68,7 @@ class Message
         } else {
             $statement->bind_param("ssss", $mid, $uid, $message, $channel_id);
         }
-        
+
         $statement->execute();
 
         return ['success' => 'true'];
@@ -178,5 +178,33 @@ class Message
         unset($row['first_name']);
         unset($row['last_name']);
         return $row;
+    }
+
+    public function delete()
+    {
+        if ($this->m_id == null) {
+            //no message to delete
+        } else {
+            global $conn;
+            $sql = "DELETE FROM `messages` WHERE `m_id` = '" . $conn->real_escape_string($this->m_id) . "'";
+            $conn->query($sql);
+        }
+    }
+
+    public function edit($new_message)
+    {
+        if ($this->m_id == null)
+        {
+            // no message to edit
+        }
+        else
+        {
+            global $conn;
+
+            $sql = "UPDATE `messages` SET `message` = '" . $conn->real_escape_string($new_message) . "' WHERE `m_id` = '" . $conn->real_escape_string($this->m_id) . "'";
+            $conn->query($sql);
+
+            $this->message = $new_message;
+        }
     }
 }

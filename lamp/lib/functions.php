@@ -19,7 +19,16 @@ function get_display_name($first_name, $last_name, $display_option) {
             return $first_name . ' ' . $last_name;
         case 2:
             return $first_name . ' ' . substr($last_name, 0, 1);
+        default:
+            return $first_name . ' ' . $last_name;
     }
+}
+
+function get_display_name_options() {
+    return [
+        [1, "First Last"],
+        [2, "First L."],
+    ];
 }
 
 
