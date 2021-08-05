@@ -446,7 +446,7 @@
             if (!User::validate_string($old)) {
                 return "Old password is required.";
             }
-            if (password_verify($old, $this->password)) {
+            if (!password_verify($old, $this->password)) {
                 return "Old password is incorrect.";
             }
             if ($old == $new) {

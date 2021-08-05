@@ -47,7 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 //invalid
                 die();
             }
-            $result = $user->change_password($_POST['current_password'], $_POST['new_password'], $_POST['confirm_new_password']);
+            $u = new User($user->uid, null, ["uid", "email", "first_name", "last_name", "display_name", "flags", "google_user_id", "password"]);
+            $result = $u->change_password($_POST['current_password'], $_POST['new_password'], $_POST['confirm_new_password']);
             if ($result != null) {
                 echo $result;
                 die();
@@ -75,19 +76,17 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 die();
             }
             header("Location: account.php?changed=name");
-        } else if ($action = 'deactivate_account') {
+        } else if ($action == 'deactivate_account') {
             $user->deactivate_account();
             header("Location: account.php?changed=deactivated");
-        }  else if ($action = 'delete_account') {
+        }  else if ($action == 'delete_account') {
             $user->delete_account();
             header("Location: account.php?changed=deleted");
-        }   else {
+        } else {
             echo 'Invalid action';
             die();
         }
     }
-} else if ($_SERVER['REQUEST_METHOD'] == "DELETE") {
-    // delete account
 } else if ($_SERVER['REQUEST_METHOD'] == "GET") {
     // show page
     include('common/header.php');
