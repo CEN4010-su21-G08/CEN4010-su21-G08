@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
             <div>
                 <h2 class="maintitleheader">Manage Course</h2>
                 <hr />
-                <form class="bur-mod-course-code" method="post" action="manage-course.php?modify=course_code">
+                <form class="bur-mod-course-code" method="post" action="manage-course.php?course_id=<?= urlencode($course_id); ?>">
                     <div class="row g-3">
                         <label class="col-4 col-form-label" for="course_code">Course Code:</label>
                         <div class="col-5">
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     </div>
                 </form>
                 <br />
-                <form class="bur-mod-section-number" method="post" action="manage-course.php?modify=section_number">
+                <form class="bur-mod-section-number" method="post" action="manage-course.php?course_id=<?= urlencode($course_id); ?>">
                     <div class="row g-3">
                         <label class="col-4 col-form-label" for="section_number">Section Number</label>
                         <div class="col-5">
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     </div>
                 </form>
                 <br />
-                <form class="bur-mod-course-name" method="post" action="manage-course.php?modify=course_name">
+                <form class="bur-mod-course-name" method="post" action="manage-course.php?course_id=<?= urlencode($course_id); ?>">
                     <div class="row g-3">
                         <label class="col-4 col-form-label" for="course_name">Course Name</label>
                         <div class="col-5">
@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     </div>
                 </form>
                 <br />
-                <form class="bur-mod-instructor-email" method="post" action="manage-course.php?modify=instructor_email">
+                <form class="bur-mod-instructor-email" method="post" action="manage-course.php?course_id=<?= urlencode($course_id); ?>">
                     <div class="row g-3">
                         <label class="col-4 col-form-label" for="instructor_email">Instructor Email</label>
                         <div class="col-5">
@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     </div>
                 </form>
                 <br />
-                <form class="bur-mod-instructor-name" method="post" action="manage-course.php?modify=instructor_name">
+                <form class="bur-mod-instructor-name" method="post" action="manage-course.php?course_id=<?= urlencode($course_id); ?>">
                     <div class="row g-3">
                         <label class="col-4 col-form-label" for="instructor_name">Instructor Name</label>
                         <div class="col-5">
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     </div>
                 </form>
                 <br />
-                <form class="bur-mod-course-desc" method="post" action="manage-course.php?modify=course_description">
+                <form class="bur-mod-course-desc" method="post" action="manage-course.php?course_id=<?= urlencode($course_id); ?>">
                     <div class="row g-3">
                         <label class="col-4 col-form-label" for="course_description">Course Description</label>
                         <div class="col-5">
@@ -118,3 +118,40 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     <?php include('./common/footer.php');
     } ?>
 <?php } ?>
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    if (isset($_POST['course_code'])) 
+        $course_code = parse_input("course_code");
+    else
+        $course_code = null;
+    
+    if (isset($_POST['section_number'])) 
+        $section_number = parse_input("section_number");
+    else
+        $section_number = null;
+    
+    if (isset($_POST['course_name'])) 
+        $course_name = parse_input("course_name");
+    else
+        $course_name = null;
+
+    if (isset($_POST['instructor_email'])) 
+        $instructor_email = parse_input("instructor_email");
+    else
+        $instructor_email = null;
+    
+    if (isset($_POST['instructor_name'])) 
+        $instructor_name = parse_input("instructor_name");
+    else
+        $instructor_name = null;
+    
+    if (isset($_POST['course_description'])) 
+        $course_description = parse_input("course_description");
+    else
+        $course_description = null;
+    
+    $course->update_course($course_code, $section_number, $instructor_email, $instructor_name, $course_description, $course_name);
+
+    header("Location: manage-course.php?course_id=" . urlencode($course_id));
+} ?>

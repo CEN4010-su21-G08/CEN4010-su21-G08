@@ -276,7 +276,7 @@
 
         public function update_course($course_code = null, $section_number = null, $instructor_email = null, $instructor_name = null, $course_description = null, $course_name = null)
         {
-            if (!isset($course_code) || !isset($section_number) || !isset($instructor_email) || !isset($instructor_name) || !isset($course_description) || !isset($course_name))
+            if (!isset($course_code) && !isset($section_number) && !isset($instructor_email) && !isset($instructor_name) && !isset($course_description) && !isset($course_name))
             {
                 throwError(500, "No parameters were updated in the course");
             }
@@ -285,7 +285,7 @@
 
             $table_updated = false;
 
-            $sql = "UPDATE `course` SET ";
+            $sql = "UPDATE `courses` SET ";
             if (isset($course_code)) 
             {
                 $sql .= "`course_code` = '" . $conn->real_escape_string($course_code) . "'";
