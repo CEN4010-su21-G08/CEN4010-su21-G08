@@ -568,7 +568,7 @@
             return true;
         }
 
-        $Membership = new CourseMembership($uid, $course_id);
+        $Membership = new CourseMembership($user->uid, $course_id);
         
         if ($Membership->role == 2)
             return true;
