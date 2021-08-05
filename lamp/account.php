@@ -78,7 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         } else if ($action = 'deactivate_account') {
             $user->deactivate_account();
             header("Location: account.php?changed=deactivated");
-        }  else {
+        }  else if ($action = 'delete_account') {
+            $user->delete_account();
+            header("Location: account.php?changed=deleted");
+        }   else {
             echo 'Invalid action';
             die();
         }
