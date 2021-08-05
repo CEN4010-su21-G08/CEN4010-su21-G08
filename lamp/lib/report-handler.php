@@ -1,6 +1,7 @@
 <?php
 
 require_once("lib/message-handler.php");
+require_once("lib/punishments-handler.php");
 
 class BasicUserInfo
 {
@@ -26,8 +27,8 @@ class BasicChannelInfo
     public $course_code = null;
     public $course_section_number = null;
 
-    function __construct() {
-        
+    function __construct()
+    {
     }
 }
 
@@ -57,25 +58,41 @@ class Report
             // query db with $r_id
             global $conn;
 
-            $sql = "SELECT * FROM `reports` WHERE `r_id` = '" . $conn->real_escape_string($r_id) .  "'";
+            $sql = "SELECT `reports`.*, `u_rr`.`first_name` AS `rr_first_name`, `u_rr`.`last_name` AS `rr_last_name`, `u_rd`.`first_name` AS `rd_first_name`, `u_rd`.`last_name` AS `rd_last_name`, `channel`.`name` AS `ch_name`, `channel`.`course_id` AS `ch_course_id`, `course`.`section_number` AS `course_section_number`, `course`.`course_code` AS `course_code` FROM `reports` LEFT JOIN `users` AS `u_rr` ON `u_rr`.`uid` = `reports`.`reporter` LEFT JOIN `users` AS `u_rd` ON `u_rd`.`uid` = `reports`.`reported` LEFT JOIN `channels` AS `channel` ON `channel`.`ch_id` = `reports`.`ch_id` LEFT JOIN `courses` AS `course` ON `course`.`course_id` = `reports`.`course_id` WHERE `reports`.`r_id` = '" . $conn->real_escape_string($r_id) . "'";
+
+
+            // $sql = "SELECT * FROM `reports` WHERE `r_id` = '" . $conn->real_escape_string($r_id) .  "'";
             $result = $conn->query($sql);
 
             $numRows = mysqli_num_rows($result);
             if ($numRows <= 0) {
                 // do nothing (no matching report)
             } else {
-                $report = $result->fetch_assoc();
+                $row = $result->fetch_assoc();
+                
+                $r = new Report();
+                $this->r_id = $row['r_id'];
+                $this->reported = $row['reported'];
+                $this->reporter = $row['reporter'];
+                $this->report_date = $row['report_date'];
+                $this->reason = $row['reason'];
+                $this->m_id = $row['m_id'];
+                $this->ch_id = $row['ch_id'];
+                $this->course_id = $row['course_id'];
+                $this->message = $row['message'];
+                $this->flags = $row['flags'];
 
-                $this->r_id = $report['r_id'];
-                $this->reported = $report['reported'];
-                $this->reporter = $report['reporter'];
-                $this->report_date = $report['report_date'];
-                $this->reason = $report['reason'];
-                $this->m_id = $report['m_id'];
-                $this->ch_id = $report['ch_id'];
-                $this->course_id = $report['course_id'];
-                $this->message = $report['message'];
-                $this->flags = $report['flags'];
+                $this->reporter_user = new BasicUserInfo($row['reporter'], $row['rr_first_name'], $row['rr_last_name']);
+                $this->reported_user = new BasicUserInfo($row['reported'], $row['rd_first_name'], $row['rd_last_name']);
+
+                $this->channel_info = new BasicChannelInfo();
+                $this->channel_info->ch_id = $row['ch_id'];
+                $this->channel_info->ch_name = $row['ch_name'];
+                $this->channel_info->ch_course_id = $row['ch_course_id'];
+
+                $this->channel_info->course_id = $row['course_id'];
+                $this->channel_info->course_code = $row['course_code'];
+                $this->channel_info->course_section_number = $row['course_section_number'];
             }
         } else {
             $this->r_id = $r_id;
@@ -231,15 +248,27 @@ class Report
         $conn->query($sql);
     }
     /*mutes user */
-    public function muteUser(){
-
+    public function muteUser()
+    {
+        global $conn;
+        Punishment::mute_user_in_course($this->reported, $this->course_id, $this->r_id, "");
+        $sql = "UPDATE `reports` SET `flags` = flags | (1 << 2) WHERE `r_id` = '" . $conn->real_escape_string($this->r_id) . "'";
+        $conn->query($sql);
     }
     /*kicks user */
-    public function kickUser(){
-
+    public function kickUser()
+    {
+        global $conn;
+        Punishment::kick_user_from_course($this->reported, $this->course_id, $this->r_id, "");
+        $sql = "UPDATE `reports` SET `flags` = flags | (1 << 3) WHERE `r_id` = '" . $conn->real_escape_string($this->r_id) . "'";
+        $conn->query($sql);
     }
     /*bans user */
-    public function banUser(){
-
+    public function banUser()
+    {
+        global $conn;
+        Punishment::ban_user_account($this->reported, $this->course_id, $this->r_id, "");
+        $sql = "UPDATE `reports` SET `flags` = flags | (1 << 4) WHERE `r_id` = '" . $conn->real_escape_string($this->r_id) . "'";
+        $conn->query($sql);
     }
 }
