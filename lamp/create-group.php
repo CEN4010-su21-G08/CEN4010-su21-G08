@@ -1,5 +1,5 @@
 <?php
-$page_title = "Create Group";
+$page_title = "Create a Group";
 $include_sidebar = true;
 ?>
 <?php require_once("lib/page-setup.php"); ?>
@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
     <?php } else {
         $users_in_course = CourseMembership::get_users_in_course($course->course_id);
         $groups = Channel::get_users_channels_in_course($_SESSION['uid'], $course_id, true); ?>
-        <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $course_id, $groups, $is_instructor); ?>
+        <?php show_sidebar("Course", $course->course_code . "-" . $course->section_number, $course_id, null, $groups, $is_instructor); ?>
         <div class="channels_main">
         <h2>Create a Group</h2>
         <?php 
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                 <br />
                 <form method="post" action="create-group.php?course_id=<?= htmlspecialchars($course_id) ?>">
                 <input required name="group_name" <?php if ($error) { ?>value="<?php echo (htmlspecialchars($_POST['group_name'])); ?>" <?php } ?>placeholder="group name" /><br />
-                <div id="list1" class="dropdown-check-list" tabindex="100">
+                <div id="user_list" class="dropdown-check-list" tabindex="100">
                     <span class="anchor">Users</span>
                     <ul class="items">
                         <?php
@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
             <?php render_create_group_page(); ?>
         </div>
         <script>
-            var checkList = document.getElementById('list1');
+            var checkList = document.getElementById('user_list');
             checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
             if (checkList.classList.contains('visible'))
                 checkList.classList.remove('visible');
@@ -69,7 +69,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
         <?php include('common/footer.php'); ?>
     <?php }
     if ($_SERVER["REQUEST_METHOD"] == "POST") {  
+        if (!$is_instructor) { 
+            include('./common/header.php'); ?>
+            <div class="alert alert-danger" style="margin: 20px;">You don't have access to this page or it doesn't exist</div>
+        <?php 
+        } else {
             if (!validate_input($_POST, "group_name")) return render_create_group_page("Please provide a group name");
+
+            $users_in_course = CourseMembership::get_users_in_course($course->course_id);
 
             $group_name = parse_input('group_name', true);
             $group = Channel::create_channel($course->course_id, $group_name, 2);
@@ -83,3 +90,4 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
             }
             header("Location: create-group.php?course_id=" . htmlspecialchars($course->course_id));
         }
+    }
