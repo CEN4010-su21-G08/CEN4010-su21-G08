@@ -385,7 +385,7 @@ form.sign-in-form, form.sign-up-form {
 }
 
 .form_required {
-    color:#EB4444;
+    color: #EB4444;
 }
 
 .form_required::before {

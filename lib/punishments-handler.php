@@ -24,12 +24,9 @@ class Punishment
     {
         global $conn;
 
-        if ($p_id == null)
-        {
+        if ($p_id == null) {
             // do nothing
-        }
-        else if ($r_id == null)
-        {
+        } else if ($r_id == null) {
             $sql = "SELECT * FROM `punishments` WHERE `p_id` = '" . $conn->real_escape_string($p_id) . "'";
             $result = $conn->query($sql);
 
@@ -48,9 +45,7 @@ class Punishment
                 $this->type = $punishment['type'];
                 $this->course_id = $punishment['course_id'];
             }
-        }
-        else
-        {
+        } else {
             $this->p_id = $p_id;
             $this->r_id = $r_id;
             $this->$uid = $uid;
@@ -180,7 +175,7 @@ class Punishment
 
     public static function unmute_user_in_channel($uid, $ch_id)
     {
-        global $conn; 
+        global $conn;
 
         $sql = "DELETE FROM `punishments` WHERE `type` = '0' AND `ch_id` = '" . $conn->real_escape_string($ch_id) . "' AND `uid` = '" . $conn->real_escape_string($uid) . "'";
 
@@ -189,7 +184,7 @@ class Punishment
 
     public static function unmute_user_in_course($uid, $course_id)
     {
-        global $conn; 
+        global $conn;
 
         $sql = "DELETE FROM `punishments` WHERE `type` = '0' AND `course_id` = '" . $conn->real_escape_string($course_id) . "' AND `uid` = '" . $conn->real_escape_string($uid) . "'";
 
@@ -198,7 +193,7 @@ class Punishment
 
     public static function unmute_user_account($uid)
     {
-        global $conn; 
+        global $conn;
 
         $sql = "DELETE FROM `punishments` WHERE `type` = '0' AND `course_id` = 'NULL' AND `ch_id` = 'NULL' AND `uid` = '" . $conn->real_escape_string($uid) . "'";
 
@@ -214,56 +209,40 @@ class Punishment
         $sql = "SELECT * FROM `punishments` WHERE `type` = '0' AND `uid` = '" . $conn->real_escape_string($uid) . "'";
         $result = $conn->query($sql);
 
-        while ($row = $result->fetch_assoc())
-        {
-            if (isset($row['ch_id']))
-            {
-                if ($row['ch_id']  == $ch_id)
-                {
-                    if (Punishment::is_expired($row['expires_at']))
-                    {
+        while ($row = $result->fetch_assoc()) {
+            if (isset($row['ch_id'])) {
+                if ($row['ch_id']  == $ch_id) {
+                    if (Punishment::is_expired($row['expires_at'])) {
                         $sql = "DELETE FROM `punishments` WHERE `p_id` = '" . $conn->real_escape_string($row['p_id']) . "'";
                         $conn->query($sql);
-                    }
-                    else
-                    {
+                    } else {
                         return true;
                     }
                 }
             }
-            if (isset($row['course_id']))
-            {
-                if ($row['course_id'] == $channel->course_id)
-                {
-                    if (Punishment::is_expired($row['expires_at']))
-                    {
+            if (isset($row['course_id'])) {
+                if ($row['course_id'] == $channel->course_id) {
+                    if (Punishment::is_expired($row['expires_at'])) {
                         $sql = "DELETE FROM `punishments` WHERE `p_id` = '" . $conn->real_escape_string($row['p_id']) . "'";
                         $conn->query($sql);
-                    }
-                    else
-                    {
+                    } else {
                         return true;
                     }
                 }
-            }
-            else if (!isset($row['ch_id']))
-            {
-                if (Punishment::is_expired($row['expires_at']))
-                {
+            } else if (!isset($row['ch_id'])) {
+                if (Punishment::is_expired($row['expires_at'])) {
                     $sql = "DELETE FROM `punishments` WHERE `p_id` = '" . $conn->real_escape_string($row['p_id']) . "'";
                     $conn->query($sql);
-                }
-                else
-                {
+                } else {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
 
-    public static function is_banned($uid, $course_id=null)
+    public static function is_banned($uid, $course_id = null)
     {
         global $conn;
 
@@ -271,34 +250,25 @@ class Punishment
 
         $result = $conn->query($sql);
 
-        while ($row = $result->fetch_assoc())
-        {
-            if (Punishment::is_expired($row['expires_at']))
-            {
+        while ($row = $result->fetch_assoc()) {
+            if (Punishment::is_expired($row['expires_at'])) {
                 $sql = "DELETE FROM `punishments` WHERE `p_id` = '" . $conn->real_escape_string($row['p_id']) . "'";
                 $conn->query($sql);
-            }
-            else
-            {
+            } else {
                 return true;
             }
         }
 
-        if (isset($course_id))
-        {
+        if (isset($course_id)) {
             $sql = "SELECT * FROM `punishments` WHERE `course_id` = '" . $conn->real_escape_string($course_id) . "' AND `uid` = '" . $conn->real_escape_string($uid) . "'";
 
             $result = $conn->query($sql);
 
-            while ($row = $result->fetch_assoc())
-            {
-                if (Punishment::is_expired($row['expires_at']))
-                {
+            while ($row = $result->fetch_assoc()) {
+                if (Punishment::is_expired($row['expires_at'])) {
                     $sql = "DELETE FROM `punishments` WHERE `p_id` = '" . $conn->real_escape_string($row['p_id']) . "'";
                     $conn->query($sql);
-                }
-                else
-                {
+                } else {
                     return true;
                 }
             }
@@ -313,14 +283,12 @@ class Punishment
 
         $out = array();
 
-        if (isset($type))
-        {
+        if (isset($type)) {
             $sql = "SELECT * FROM `punishments` WHERE `uid` = '" . $conn->real_escape_string($uid) . "' AND `type` = '" . $conn->real_escape_string($type) . "'";
 
             $result = $conn->query($sql);
 
-            while ($row = $result->fetch_assoc())
-            {
+            while ($row = $result->fetch_assoc()) {
                 $punishment = new Punishment();
                 $punishment->p_id = $row['p_id'];
                 if (isset($row['r_id'])) $punishment->r_id = $row['r_id'];
@@ -333,15 +301,12 @@ class Punishment
 
                 $out[] = $punishment;
             }
-        }
-        else
-        {
+        } else {
             $sql = "SELECT * FROM `punishments` WHERE `uid` = '" . $conn->real_escape_string($uid) . "'";
 
             $result = $conn->query($sql);
 
-            while ($row = $result->fetch_assoc())
-            {
+            while ($row = $result->fetch_assoc()) {
                 $punishment = new Punishment();
                 $punishment->p_id = $row['p_id'];
                 if (isset($row['r_id'])) $punishment->r_id = $row['r_id'];
@@ -355,7 +320,7 @@ class Punishment
                 $out[] = $punishment;
             }
         }
-        
+
         return $out;
     }
 

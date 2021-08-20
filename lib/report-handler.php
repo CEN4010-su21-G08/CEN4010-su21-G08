@@ -69,7 +69,7 @@ class Report
                 // do nothing (no matching report)
             } else {
                 $row = $result->fetch_assoc();
-                
+
                 $r = new Report();
                 $this->r_id = $row['r_id'];
                 $this->reported = $row['reported'];

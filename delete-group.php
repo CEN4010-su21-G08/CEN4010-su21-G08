@@ -13,19 +13,15 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
         die();
     }
     $channel_id = $_GET["ch_id"];
-    echo($channel_id);
+    echo ($channel_id);
     $channel = new Channel($channel_id);
     $course = new Course($channel->course_id);
     $is_instructor = is_user_instructor($course->course_id);
 
-    if (!$is_instructor && ($channel->type != 2))
-    {
+    if (!$is_instructor && ($channel->type != 2)) {
         header("Location: courses.php");
         die();
-    }
-    else
-    {
-        
+    } else {
     }
 } ?>
 

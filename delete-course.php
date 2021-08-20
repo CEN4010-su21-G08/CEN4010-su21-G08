@@ -15,21 +15,22 @@ $course_id = $_GET["course_id"];
 $course = new Course($course_id);
 $is_instructor = is_user_instructor($course_id);
 include('./common/header.php');
-function renderDeleteCoursePage($error=null) { ?>
-    <h1>Delete a Course</h1>  
+function renderDeleteCoursePage($error = null)
+{ ?>
+    <h1>Delete a Course</h1>
     <?php
     global $course_id, $course;
     if ($error) { ?>
-    <br />
-    <div class="alert alert-danger" style="margin-right: 15px;"><?php echo $error; ?></div>
+        <br />
+        <div class="alert alert-danger" style="margin-right: 15px;"><?php echo $error; ?></div>
     <?php } ?>
     <br />
-    <div class="alert alert-warning" style="margin-right: 15px;">Type 'confirm' into the box below to delete class <?= $course->course_code . "-" . $course->section_number?></div>
+    <div class="alert alert-warning" style="margin-right: 15px;">Type 'confirm' into the box below to delete class <?= $course->course_code . "-" . $course->section_number ?></div>
     <form method="post" action="delete-course.php?course_id=<?= htmlspecialchars($course_id) ?>">
-    <input required name="confirm" placeholder="type 'confirm'" /><br />
-    <br />
-    <br />
-    <button type="submit">Submit</button>
+        <input required name="confirm" placeholder="type 'confirm'" /><br />
+        <br />
+        <br />
+        <button type="submit">Submit</button>
     </form>
 <?php }
 if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
@@ -38,35 +39,25 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
         header("Location: courses.php");
         die();
     }
-    if (!$is_instructor)
-    { ?>
+    if (!$is_instructor) { ?>
         <div class="alert alert-danger" style="margin: 20px;">You don't have access to this page or it doesn't exist</div>
-    <?php }
-    else
-    { ?>
+    <?php } else { ?>
         <?php renderDeleteCoursePage(); ?>
     <?php } ?>
-<?php }
-if ($_SERVER["REQUEST_METHOD"] == "POST") {  
-        if (!$is_instructor) { ?>
-            <div class="alert alert-danger" style="margin: 20px;">You don't have access to this page or it doesn't exist</div>
-        <?php 
+    <?php }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!$is_instructor) { ?>
+        <div class="alert alert-danger" style="margin: 20px;">You don't have access to this page or it doesn't exist</div>
+<?php
+    } else {
+        $confirmed = parse_input("confirm");
+        if (!isset($confirmed)) {
+            renderDeleteCoursePage("Please type 'confirm' into the field below");
+        } else if ($confirmed == "confirm") {
+            $course->delete_course();
+            header("Location: courses.php");
         } else {
-            $confirmed = parse_input("confirm");
-            if (!isset($confirmed))
-            {
-                renderDeleteCoursePage("Please type 'confirm' into the field below");
-            }
-            else if ($confirmed == "confirm")
-            {
-                $course->delete_course();
-                header("Location: courses.php");
-            }
-            else
-            {
-                renderDeleteCoursePage("Please type 'confirm' into the field below");
-            }
+            renderDeleteCoursePage("Please type 'confirm' into the field below");
         }
     }
-
-
+}

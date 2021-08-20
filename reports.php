@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     sendError("Forbidden", 403);
                 }
             }
-            
+
             $message = Message::get($m_id);
             if ($message->ch_id == null || $message->ch_id !== $ch_id) {
                 sendError("Mismatched channel provided", 400);

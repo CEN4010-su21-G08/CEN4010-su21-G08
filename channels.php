@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
                     <h2>INSTRUCTOR VIEW</h2>
                     <?php
                     if ($channel->type == 2) { ?>
-                        <a href="manage-group.php?ch_id=<?=$channel->ch_id?>">Manage Group</a>
+                        <a href="manage-group.php?ch_id=<?= $channel->ch_id ?>">Manage Group</a>
                     <?php } ?>
                 <?php } ?>
                 <div class="older">

@@ -402,4 +402,3 @@
             $this->course_id = $course_id;
         }
     }
-?>

@@ -121,36 +121,36 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    if (isset($_POST['course_code'])) 
+    if (isset($_POST['course_code']))
         $course_code = parse_input("course_code");
     else
         $course_code = null;
-    
-    if (isset($_POST['section_number'])) 
+
+    if (isset($_POST['section_number']))
         $section_number = parse_input("section_number");
     else
         $section_number = null;
-    
-    if (isset($_POST['course_name'])) 
+
+    if (isset($_POST['course_name']))
         $course_name = parse_input("course_name");
     else
         $course_name = null;
 
-    if (isset($_POST['instructor_email'])) 
+    if (isset($_POST['instructor_email']))
         $instructor_email = parse_input("instructor_email");
     else
         $instructor_email = null;
-    
-    if (isset($_POST['instructor_name'])) 
+
+    if (isset($_POST['instructor_name']))
         $instructor_name = parse_input("instructor_name");
     else
         $instructor_name = null;
-    
-    if (isset($_POST['course_description'])) 
+
+    if (isset($_POST['course_description']))
         $course_description = parse_input("course_description");
     else
         $course_description = null;
-    
+
     $course->update_course($course_code, $section_number, $instructor_email, $instructor_name, $course_description, $course_name);
 
     header("Location: manage-course.php?course_id=" . urlencode($course_id));

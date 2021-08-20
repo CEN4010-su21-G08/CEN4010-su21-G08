@@ -3,7 +3,8 @@
 /* Temporary fix because composer does not work on older versions of PHP
     (the previously-used UUID package used Composer) */
 /* Code Snippet taken from SO answer: https://stackoverflow.com/a/4356295 */
-function generateRandomString($length = 36) {
+function generateRandomString($length = 36)
+{
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $charactersLength = strlen($characters);
     $randomString = '';
@@ -13,8 +14,9 @@ function generateRandomString($length = 36) {
     return $randomString;
 }
 
-function get_display_name($first_name, $last_name, $display_option) {
-    switch($display_option) {
+function get_display_name($first_name, $last_name, $display_option)
+{
+    switch ($display_option) {
         case 1:
             return $first_name . ' ' . $last_name;
         case 2:
@@ -24,7 +26,8 @@ function get_display_name($first_name, $last_name, $display_option) {
     }
 }
 
-function get_display_name_options() {
+function get_display_name_options()
+{
     return [
         [1, "First Last"],
         [2, "First L."],
@@ -32,15 +35,16 @@ function get_display_name_options() {
 }
 
 
-function get_channel_type($channel_id) {
+function get_channel_type($channel_id)
+{
     global $conn;
     $sql = "SELECT `type` FROM `channels` WHERE `ch_id` = '" . $conn->real_escape_string($channel_id) . "'";
     $result = $conn->query($sql);
     // $statement = $conn->prepare($sql);
-    
+
     // $statement->bind_param("s", $channel_id);
     // $statement->execute();
-    
+
     // $result = $statement->get_result();
     $numRows = mysqli_num_rows($result);
     if ($numRows <= 0) {
@@ -50,7 +54,8 @@ function get_channel_type($channel_id) {
     return $channel['type'];
 }
 
-function validate_input($arr, $field_name) {
+function validate_input($arr, $field_name)
+{
     if (!isset($arr[$field_name])) {
         return false;
     }
@@ -65,7 +70,8 @@ function validate_input($arr, $field_name) {
     return true;
 }
 
-function parse_input($field_name, $required=false) {
+function parse_input($field_name, $required = false)
+{
     if (!isset($_POST[$field_name])) {
         if ($required) throwError(400, "Invalid input. Missing field " . $field_name);
         else return NULL;
@@ -81,7 +87,8 @@ function parse_input($field_name, $required=false) {
     return $data;
 }
 
-function parse_get_input($field_name, $required=false) {
+function parse_get_input($field_name, $required = false)
+{
     if (!isset($_GET[$field_name])) {
         if ($required) throwError(400, "Invalid input. Missing field " . $field_name);
         else return NULL;

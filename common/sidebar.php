@@ -81,7 +81,7 @@ function show_sidebar($heading, $course_name, $course_id, $channel_name,  $group
             </ul>
         </div>
     </div>
-    
+
     <div id="members_modal" class="modal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -90,17 +90,18 @@ function show_sidebar($heading, $course_name, $course_id, $channel_name,  $group
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                <?php if (count($members) > 0) { ?>
-                    <ul><?php 
-                        foreach($members as $member) {
+                    <?php if (count($members) > 0) { ?>
+                        <ul><?php
+                            foreach ($members as $member) {
                             ?>
-                            <li><?= htmlspecialchars($member->display_name); ?></li>
-                            <?php 
-                        }
-                        ?></ul>
-                    <?php } else {
-                        ?>No members<?php 
-                    } ?>
+                                <li><?= htmlspecialchars($member->display_name); ?></li>
+                            <?php
+                            }
+                            ?>
+                        </ul>
+                        <?php } else {
+                        ?>No members<?php
+                                } ?>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
@@ -124,7 +125,7 @@ function show_sidebar($heading, $course_name, $course_id, $channel_name,  $group
         <?php if (isset($_GET['members'])) { ?>
             new bootstrap.Modal(document.getElementById('members_modal'), {}).show();
             // remove "members" from url so it doesnt become annoying:
-            window.history.replaceState({}, document.title, "channels.php?ch_id=<?= urlencode(htmlspecialchars($_GET['ch_id']));?>");
+            window.history.replaceState({}, document.title, "channels.php?ch_id=<?= urlencode(htmlspecialchars($_GET['ch_id'])); ?>");
         <?php } ?>
     </script>
     <div class="main-content<?php if (isset($center_page)) { ?> main-content-center<?php } ?>">
