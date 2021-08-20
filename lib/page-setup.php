@@ -1,12 +1,12 @@
 <?php
 define("app_page", true);
 
-$is_logged_in = false;
-$user = new User();
-
 require_once('lib/database.php');
 require_once('lib/functions.php');
 require_once('lib/authentication.php');
+
+$is_logged_in = false;
+$user = new User();
 
 session_start();
 if (isset($_SESSION['user_id'])) {
