@@ -2,7 +2,7 @@
     define("app_page", true);
 
     $is_logged_in = false;
-    $user = null;
+    $user = new User();
 
     require_once('lib/database.php');
     require_once('lib/functions.php');
@@ -13,7 +13,7 @@
         $is_logged_in = true;
         $user = new User($_SESSION['user_id']);
     }
-    if ($user != null && !$user->is_active()) {
+    if ($user->uid != null && !$user->is_active()) {
         $is_logged_in = false;
         $user = null;
         session_destroy();
@@ -31,7 +31,7 @@
 
             } else {
                 // redirect to verify page
-                if ($user == null || !$user->has_verified()) {
+                if ($user->uid == null || !$user->has_verified()) {
                     header("Location: verify.php");
                 }
             }
