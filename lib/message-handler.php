@@ -15,6 +15,20 @@ class Message
     public $display_name = null;
     public $initials = null;
 
+    /**
+     * Message Constructor
+     * Creates message instance with provided parameters, does not fetch from db
+     * 
+     * m_id - message id
+     * uid - author's uid
+     * message - message contents
+     * ch_id - channel id in which the message was sent
+     * flags - message flags
+     * send_date - date sent
+     * edit_date - date edited
+     * display_name - author's display name (str)
+     * initials - author's initials
+     */
     function  __construct($m_id = null, $uid = null, $message = null, $ch_id = null, $flags = null, $send_date = null, $edit_date = null, $display_name = null, $initials = null)
     {
         $this->m_id = $m_id;
@@ -30,6 +44,19 @@ class Message
         $this->initials = $initials;
     }
 
+    /**
+     * Message::send()
+     * sends a message as the specified user
+     * 
+     * channel_id - channel id to send message in
+     * uid - author's uid
+     * message - message contents
+     * announcement - whether message is announcement (only works for instructor)
+     * 
+     * Returns array, indicating status of request
+     *      error: if present, an error occured, error may be specified in value
+     *      success: if present, request was successful
+     */
     public static function send($channel_id, $uid, $message, $announcement = false)
     {
         if (!isset($channel_id)) {
@@ -39,7 +66,7 @@ class Message
         if (!does_user_have_access($uid, $channel_id)) {
             return ['error' => "Forbidden"];
         }
-
+        // TODO: check if  $uid is instructor, not current user
         if ($announcement && !is_user_instructor($channel_id)) {
             return ['error' => "Forbidden"];
         }
@@ -74,6 +101,15 @@ class Message
         return ['success' => 'true'];
     }
 
+    /**
+     * Message::get()
+     * gets a single message (does not check permissions)
+     * 
+     * message_id - id of message
+     * 
+     * Returns message
+     *      message will have null values if message cannot be found, otherwise, returns instance of Message
+     */
     public static function get($message_id)
     {
         global $conn;
