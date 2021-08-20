@@ -16,11 +16,11 @@
         4. Copy the contents of the ZIP file from #2 into the lamp/lib/googleapis folder
         5. Ensure the vendor folder is accessible at lamp/lib/googleapis/vendor. 
            If it isn't, you copied the files incorrectly
-        6. Copy googleapis-config-sample.php as googleapis-config.php
+        6. In the config file, copy googleapis-config-sample.php as googleapis-config.php
         7. Fill in the appropriate values for the client id, secret, and redirect URI
     */
     require_once("lib/googleapis/vendor/autoload.php");
-    require_once("lib/googleapis-config.php");
+    require_once("config/googleapis-config.php");
 
     $client = new Google\Client();
     $client->setClientId($google_client_id);

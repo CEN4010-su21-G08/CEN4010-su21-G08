@@ -1,5 +1,5 @@
 <?php
-include('./lib/database-config.php');
+include('./config/database-config.php');
 function throwError($code, $message) {
     http_response_code($code);
     die($message);
